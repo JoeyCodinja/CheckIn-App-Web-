@@ -104,18 +104,6 @@ function generateSignOutButton(isSignedIn){
     
 }
 
-function toggleCheckOutButton(){
-    
-}
-
-function submitUser(email, name){
-    
-}
-
-function isUser(email){
-    
-}
-
 function getTokenId(){
     if (googleUserObject != null){
         return googleUserObject.getAuthResponse().id_token;
@@ -132,7 +120,7 @@ function redirectUser(){
     var dashboardDeterminant = window.location.origin + '/dashboard';
     getFirebaseToken().then(function(value){
         checkUUID()
-        post(dashboardDeterminant, getTokenId(), value)
+        post(dashboardDeterminant, [getTokenId(), value])
     },
     function(error){
         window.alert('Can\'t retrieve Firebase token Id');
