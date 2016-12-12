@@ -1,0 +1,71 @@
+{% macro intern_arrived(intern_info, time) - %}
+<div class="col-lg-4 col-xs-6">
+    <!-- TODO: add own color scheme for these backgrounds -->
+    <div class="small-box">
+        <div class="inner">
+            <!-- name of the person who has arrived --> 
+            <h5 class="intern-name">intern_info.getName()</h5>
+            <!-- Location where the person has checked-in from -->
+            <h4 class="intern-arrive-time">intern_info.getTime('arrival')s</h4>
+        </div>
+        <div class="icon">
+            <!--Picture from Google profile --> 
+            <i class="ion ion-android-person"></i>
+        </div>
+        <a href="#" class="small-box-footer">
+            Confirm <i class="ion ion-checkmark-round"></i>
+        </a>
+    </div>
+</div>
+{%- endmacro %} 
+
+{% macro intern_at_lunch(intern_info, time) -%}
+<div class="col-lg-4 col-xs-6">
+    <!-- TODO: add own color scheme for these backgrounds -->
+    <div class="small-box">
+        <div class="inner">
+            <!-- name of the person who has arrived --> 
+            <h5 class="intern-name">intern_info.getName()</h5>
+            <!-- Location where the person has checked-in from -->
+            <h4 class="intern-lunch-time">intern_info.getTime('lunch_start')</h4>
+        </div>
+        <div class="icon">
+            <!--Picture from Google profile --> 
+            <i class="fa fa-cutlery" aria-hidden="true"></i>
+        </div>
+        <!-- TODO:  --> 
+        <div class="countdown">
+            
+        </div>
+        <a href="#" class="small-box-footer">
+            Confirm <i class="ion ion-checkmark-round"></i>
+        </a>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{% macro intern_checkout(intern_info, time) -%}
+<div class="col-lg-4 col-xs-6">
+    <!-- TODO: add own color scheme for these backgrounds -->
+    <div class="small-box">
+        <div class="inner">
+            <!-- name of the person who has arrived --> 
+            <h5 class="intern-name">intern_info.getName()</h5>
+            <!-- Location where the person has checked-in from -->
+            <h4 class="intern-lunch-time">intern_info.getTime('arrival')s</h4>
+        </div>
+        <div class="icon">
+            <!--Picture from Google profile --> 
+            <i class="ion ion-android-person"></i>
+        </div>
+        <!-- TODO:  --> 
+        <div class="countdown">
+            
+        </div>
+        <a href="#" class="small-box-footer">
+            Confirm <i class="ion ion-checkmark-round"></i>
+        </a>
+    </div>
+</div>
+{%- endmacro %}

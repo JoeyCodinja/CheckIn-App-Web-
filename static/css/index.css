@@ -1,0 +1,14 @@
+.btn{ 
+    background-color: white;
+    display: inline-block;
+    width: 75px;
+    text-align: center;
+    padding:10px;
+    box-shadow: black 0px 2px 4px;
+    margin-top: 15px;
+    
+}
+
+.btn:hover {
+    box-shadow: black 0px 2px 2px;
+}

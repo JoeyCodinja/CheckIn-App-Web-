@@ -1,0 +1,183 @@
+{% macro manage_users(user_type=99, user_listing=[]) -%}
+<!-- 
+     Both sections start off hidden so as not to 
+     interrupt the main dashboard
+--> 
+<section class="content-header hidden">
+    <h1 style="display: inline-block;">
+        {% if user_type == 90 %}
+            Intern Registration Management
+        {% elif user_type == 10 %}
+            Staff Registration Management
+        {% else %}
+            Unregistered User Management
+        {% endif %}
+    </h1>
+    {% if user_type in (10, 90) %}
+        <button type="button" class="btn btn-success" 
+                style="float: right;"
+                data-toggle="modal" data-target="#add_user">
+            Pre-Register User 
+        </button>
+    {% endif %}
+</section>
+<section class="content hidden">
+    <div class="box">
+        <div class="box-header">
+            <h3 class="box-title"> 
+                {% if user_type == 90 %}
+                    Registered Intern
+                {% elif user_type == 10 %}
+                    Registered Staff
+                {% else %}
+                    Unregistered Users
+                {% endif %} 
+            </h3>
+        </div> <!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+                <tbody>
+                    {% if user_type in (90, 10) %}
+                        <tr>
+                            <!-- Table Headings --> 
+                            <td>Pass ID</td>
+                            <td>Name</td>
+                            <td>Email</td>
+                            <td><!-- Action --></td>
+                        </tr>
+                        {% for user in user_listing %}
+                        <tr>
+                            <td>{{ user.getPassId() }}</td>
+                            <td>{{ user.getName() }}</td>
+                            <td>{{ user.getEmail() }} </td>
+                            <td>
+                                <button type="button" class="btn btn-danger"
+                                        data-toggle="modal" data-target="#delete_user">
+                                    Delete User
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %} 
+                        <tr> 
+                            <!-- Table Headings --> 
+                            <td>Email</td>
+                            <td>Name</td>
+                            <td><!-- Action --></td>
+                        </tr>
+                        {% for user in user_listing %}
+                        <tr>
+                            <td>{{ user.getEmail() }}</td>
+                            <td>{{ user.getName() }}</td>
+                            <td>
+                                <button type="button" class="btn btn-success register_user"
+                                        data-toggle="modal" data-target="#add_unregistered">
+                                    Register
+                                </button>
+                                <button type="button" class="btn btn-danger register_cancel">
+                                    Cancel
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %} 
+                </tbody>
+                
+            </table>
+        </div> <!-- /.box-body --> 
+    </div>
+</section>
+{%- endmacro %}
+
+{% macro add_user(unregistered=False) -%}
+<!-- Add User modal -->
+{% if unregistered %}
+<div class="modal" role="dialog" id="add_user">
+{% else %}
+<div class="modal" role="dialog" id="add_unregistered">
+{% endif %}
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <h4 class="modal-title">Add User</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" method="POST" 
+                      action="{{ url_for('user_pre_registration') }}">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="inputEmail" class="col-sm-3 control-label">Email Address </label>
+                            <div class="col-sm-9">
+                                <input type="email" name="email" id="inputEmail" class="form-control" placeholder="bob@smileymail.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFirstName" class="col-sm-3 control-label">First Name</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="first-name" id="inputFirstName" class="form-control" placeholder="Bob">
+                            </div>
+                            <label for="inputLastName" class="col-sm-3 control-label">Last Name</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="last-name" id="inputLastName" class="form-control" placeholder="Smiley">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassId" class="col-sm-3 control-label">Pass ID</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="id" class="form-control" id="inputPassId" placeholder="97127p or 10010829">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-5 col-sm-offset-2">
+                                <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="user_type" value="90">
+                                    Intern
+                                </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="user_type" value="10">
+                                    Staff
+                                </label>
+                                </div>    
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">Confirm</button>
+                <button type="button" class="btn btn-danger">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro delete_user() -%}
+<div class="modal modal-warning" role="dialog" id="delete_user">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+                <h4 class="modal-title">Delete User</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete --user-name--</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">Confirm</button>
+                <button type="button" class="btn btn-danger">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endmacro %}

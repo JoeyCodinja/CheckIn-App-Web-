@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <meta name="google-signin-client_id" content="188380223415-ddaj7pcggh2jstsrgb3vin6pfbbbtjm2.apps.googleusercontent.com">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Simple login form</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}"/>
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}"/>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  
+  
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="login">
+    	<h1 class="login-heading">
+        <strong>Check In Application.</strong> Login.
+      </h1>
+      <div class="g-signin2" data-onsuccess="onSignIn" onclick="signIn()"></div>
+    </div>
+  </div>
+  
+    <script src="{{ url_for('static', filename='js/plugins/jquery-2.2.3.min.js') }}"></script>
+    <!-- UUID Gen --> 
+    <script src="{{ url_for('static', filename='js/plugins/uuid-random.min.js') }}"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-database.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBLOhr2voKEhut0Vch6tDQGiSLiwiy26vo",
+        authDomain: "checkinapp-148816.firebaseapp.com",
+        databaseURL: "https://checkinapp-148816.firebaseio.com",
+        storageBucket: "checkinapp-148816.appspot.com",
+        messagingSenderId: "188380223415"
+      };
+      firebase.initializeApp(config);
+      var database = firebase.database();
+    </script>
+    
+    <script>
+      
+    </script>
+    
+  
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script> 
+    
+    
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% macro locate_pc(pc_listing=[]) -%}
+<!-- 
+    Used to house all the UUIDs of the PCs 
+    that log onto a machine that is not yet 
+    registered with the system and has not 
+    been verified to be at a particular location 
+--> 
+<section class="content-header hidden">
+    <h1>
+        PC Location Management
+    </h1>
+</section>
+<section class="content hidden">
+    <div class="box">
+        <div class="box-header">
+            <h3 class="bot-title">
+                Registered PC Locations
+            </h3>
+        </div>
+    </div>
+    <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+            <tbody>
+                <!-- Table titles--> 
+                <tr>
+                    <!-- PC Name -->
+                    <td>PC UUID</td>
+                    <td>Location Assigned</td>
+                    
+                </tr>
+                {% for pc in pc_listing %} 
+                <tr>
+                    <td>pc.get_identifier()</td>
+                    <td>pc.get_assigned_loc()</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</section>
+{%- endmacro %}
