@@ -13,30 +13,126 @@
 <section class="content hidden">
     <div class="box">
         <div class="box-header">
-            <h3 class="bot-title">
+            <h3 class="box-title">
                 Registered PC Locations
             </h3>
         </div>
-    </div>
-    <div class="box-body table-responsive no-padding">
-        <table class="table table-hover">
-            <tbody>
-                <!-- Table titles--> 
-                <tr>
-                    <!-- PC Name -->
-                    <td>PC UUID</td>
-                    <td>Location Assigned</td>
+    
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+                <tbody>
+                    <!-- Table titles--> 
+                    <tr>
+                        <!-- PC Name -->
+                        <td>PC UUID</td>
+                        <td>Location Assigned</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for pc in pc_listing %} 
+                    <tr>
+                        <td>{{ pc.get_identifier() }} </td>
+                        <td>{{ pc.get_assigned_loc() }}</td>
+                        <td>
+                            <button type="button" class="btn btn-success"
+                                data-toggle="modal" data-target="#assign_location">
+                                Assign to Location
+                            </button>
+                        </td>
+                        {% if pc.get_assigned_loc() != pc.Unregistered %}
+                        <td>
+                            <button type="button" class="btn btn-danger"
+                                    data-toggle="modal" data-target="#unassign_location">
+                                Unassign From Location
+                            </button>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
                     
-                </tr>
-                {% for pc in pc_listing %} 
-                <tr>
-                    <td>pc.get_identifier()</td>
-                    <td>pc.get_assigned_loc()</td>
-                </tr>
-                {% endfor %}
-                
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 {%- endmacro %}
+
+{% macro assign_location(valid_locations) -%}
+    <div class="modal" role="dialog" id="assign_location">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <h4 class="modal-title">Assign Location to PC</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" method="POST"
+                          action="{{ request.host_url.replace('http','https') + 'dashboard/assign_location' }} ">
+                        <div class="form-group">
+                            
+                        </div>
+                        <div class="form-group">
+                            <label for="pc_id" class="col-sm-3 control-label">PC UUID</label>
+                            <div class="col-sm-9">
+                                <input name='uuid' id='pc_id' class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="assigned_location" class="col-sm-3 control-label">
+                                Location Assignment
+                            </label>
+                            <div class="col-sm-9">
+                                <select name="location" id="assigned_location"
+                                        class="form-control">
+                                    {% for location in valid_locations %}
+                                        <option value="{{ location }}">
+                                            {{ valid_locations[location] }} 
+                                        </option>
+                                    {% endfor %} 
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success">Confirm</button>
+                    <button type="button" class="btn btn-danger" 
+                            data-dismiss="modal" aria-label="close">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{%- endmacro %} 
+
+{% macro unassign_location() -%}
+    <div class="modal" role="dialog" id="unassign_location">
+        <div class="modal-dialog" role="document">
+            <div class='modal-content'>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <h4 class="modal-title">Unassign PC From Location</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" method="POST"
+                          action="{{ request.host_url.replace('http','https') + 'dashboard/unassign_location' }}">
+                        <input name="uuid" id="pc_id" >
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success">Confirm</button>
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal" aria-label="close">
+                        Cancel 
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %} 

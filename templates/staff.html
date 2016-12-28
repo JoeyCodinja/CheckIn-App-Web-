@@ -250,8 +250,18 @@ desired effect
       <ul class="sidebar-menu">
         <li class="header">HEADER</li>
         <!-- Optionally, you can add icons to the links -->
-        <li><a><span>Intern CheckIn</span></a></li>
-        <li><a><span>System Location Management</span></a></li>
+        <li>
+          <a>
+            <i class="fa fa-clock-o"></i>
+            <span>Intern CheckIn</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <i class="fa fa-server"></i>
+            <span>System Location Management</span>
+            </a>
+        </li>
         <li class="treeview">
           <a href="#"><i class="fa fa-users"></i> <span>User Management</span>
             <span class="pull-right-container">
@@ -448,10 +458,13 @@ desired effect
      user experience. Slimscroll is required when using the
      fixed layout. -->
 {% import 'manage_users.html' as user_manage %}
+{% import 'pc_locate.html' as locate_pc %} 
       
     {{ user_manage.add_user(True) }}
     {{ user_manage.delete_user() }}
     {{ user_manage.add_user() }}
+    {{ locate_pc.assign_location(valid_locations) }}
+    {{ locate_pc.unassign_location() }} 
     
 </body>
 </html>

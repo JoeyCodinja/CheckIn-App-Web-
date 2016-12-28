@@ -55,7 +55,7 @@ class Database(object):
         try:
             if token is None and self.token is not None:
                 token = self.token
-            print "Firebase SET:" + sultimate_node.set(data, token)
+            print "Firebase SET:" + str(ultimate_node.set(data, token)) 
             print "Location" + str(location)
         except HTTPError as e: 
             print "Firebase SET: " + e.strerror  + '\nLocation:' + str(location) + '\nData: ' + str(data)

@@ -18,7 +18,9 @@
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/AdminLTE/skin-black-light.min.css') }}">
   
-  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}"/> 
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_i.css') }}">
+  
+  <link rel="manifest" hreafff="{{ url_for('static', filename='manifest/manifest.json') }}"/> 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -27,7 +29,7 @@
   <![endif]-->
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
-<body class="hold-transition skin-blue layout-top-nav">
+<body class="hold-transition skin-black-light layout-top-nav">
 <div class="wrapper">
 
   <header class="main-header">
@@ -203,7 +205,10 @@
                     <a href="#" class="btn btn-default btn-flat">Profile</a>
                   </div>
                   <div class="pull-right">
-                    <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                    <a onclick="signOut()" 
+                       class="btn btn-default btn-flat">
+                      Sign out
+                      </a>
                   </div>
                 </li>
               </ul>
@@ -228,7 +233,511 @@
 
       <!-- Main content -->
       <section class="content">
-        <div class="log-btn"></div>
+        <div class="checkin-btn">
+          <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="53.501278mm"
+   height="53.501247mm"
+   viewBox="0 0 189.57146 189.57135"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="checkin_unpressed.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="156.25828"
+     inkscape:cy="128.87396"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="745"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-30.928543,-21.862267)">
+    <ellipse
+       style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:#be0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-6"
+       cx="125.71426"
+       cy="120.93362"
+       rx="94.285713"
+       ry="90" />
+    <ellipse
+       style="fill:#ff0000;fill-rule:evenodd;stroke:#be0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-7"
+       cx="125.71429"
+       cy="112.36227"
+       rx="94.285713"
+       ry="90" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="44.285702"
+       y="127.36221"
+       id="text4200"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4202"
+         x="44.285702"
+         y="127.36221"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Check In</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="44.493584"
+       y="125.09227"
+       id="text4200-4"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4202-8"
+         x="44.493584"
+         y="125.09227"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Check In</tspan></text>
+  </g>
+</svg>
+        </div>
+        <div class="checkin-btn pressed">
+          <svg
+             xmlns:dc="http://purl.org/dc/elements/1.1/"
+             xmlns:cc="http://creativecommons.org/ns#"
+             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:svg="http://www.w3.org/2000/svg"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+             xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+             width="53.50127mm"
+             height="51.514824mm"
+             viewBox="0 0 189.57143 182.53284"
+             id="svg2"
+             version="1.1"
+             inkscape:version="0.91 r13725"
+             sodipodi:docname="checkin_pressed.svg">
+            <defs
+               id="defs4" />
+            <sodipodi:namedview
+               id="base"
+               pagecolor="#ffffff"
+               bordercolor="#666666"
+               borderopacity="0"
+               inkscape:pageopacity="0.0"
+               inkscape:pageshadow="2"
+               inkscape:zoom="1.979899"
+               inkscape:cx="38.740863"
+               inkscape:cy="87.464039"
+               inkscape:document-units="px"
+               inkscape:current-layer="layer1"
+               showgrid="false"
+               inkscape:window-width="1366"
+               inkscape:window-height="745"
+               inkscape:window-x="-8"
+               inkscape:window-y="-8"
+               inkscape:window-maximized="1"
+               fit-margin-top="0"
+               fit-margin-left="0"
+               fit-margin-right="0"
+               fit-margin-bottom="0" />
+            <metadata
+               id="metadata7">
+              <rdf:RDF>
+                <cc:Work
+                   rdf:about="">
+                  <dc:format>image/svg+xml</dc:format>
+                  <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                  <dc:title></dc:title>
+                </cc:Work>
+              </rdf:RDF>
+            </metadata>
+            <g
+               inkscape:label="Layer 1"
+               inkscape:groupmode="layer"
+               id="layer1"
+               transform="translate(-33.071404,-13.290756)">
+              <ellipse
+                 style="fill:#be0000;fill-opacity:1;fill-rule:evenodd;stroke:#be0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-6"
+                 cx="127.85712"
+                 cy="103.79076"
+                 rx="94.285713"
+                 ry="90" />
+              <ellipse
+                 style="fill:#9e0000;fill-opacity:1;fill-rule:evenodd;stroke:#bd0505;stroke-width:0.94805419px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-7"
+                 cx="135.0047"
+                 cy="101.86103"
+                 rx="88.956802"
+                 ry="85.738411"
+                 transform="matrix(0.99828713,0.05850468,-0.05738033,0.99835239,0,0)" />
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:38.32694626px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="48.211681"
+                 y="117.91541"
+                 id="text4200"
+                 sodipodi:linespacing="125%"
+                 transform="scale(1.0138377,0.98635118)"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202"
+                   x="48.211681"
+                   y="117.91541"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Check In</tspan></text>
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="46.636444"
+                 y="114.83794"
+                 id="text4200-4"
+                 sodipodi:linespacing="125%"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202-8"
+                   x="46.636444"
+                   y="114.83794"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Check In</tspan></text>
+            </g>
+          </svg>
+        </div>
+        <div class="pending-btn hidden">
+            <svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="53.504444mm"
+   height="53.496449mm"
+   viewBox="0 0 189.58268 189.55434"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="pending_unpressed.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="102.52111"
+     inkscape:cy="150.17851"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="745"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-33.071404,-6.8792697)">
+    <ellipse
+       style="fill:#a18626;fill-opacity:1;fill-rule:evenodd;stroke:#a18626;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-6"
+       cx="127.85712"
+       cy="105.93362"
+       rx="94.285713"
+       ry="90" />
+    <ellipse
+       style="fill:#ffc805;fill-opacity:1;fill-rule:evenodd;stroke:#a18626;stroke-width:0.99996412px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-7"
+       cx="133.2975"
+       cy="89.809654"
+       rx="94.296951"
+       ry="89.982788"
+       transform="matrix(0.99832113,0.05792174,-0.05795785,0.99831903,0,0)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="48.571419"
+       y="110.21935"
+       id="text4200"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4202"
+         x="48.571419"
+         y="110.21935"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Pending</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="48.779301"
+       y="107.6493"
+       id="text4200-4"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4202-8"
+         x="48.779301"
+         y="107.6493"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Pending </tspan></text>
+  </g>
+</svg>
+        </div>
+        <div class="checkout-btn hidden">
+          <svg
+             xmlns:dc="http://purl.org/dc/elements/1.1/"
+             xmlns:cc="http://creativecommons.org/ns#"
+             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:svg="http://www.w3.org/2000/svg"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+             xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+             width="53.504444mm"
+             height="53.496449mm"
+             viewBox="0 0 189.58268 189.55434"
+             id="svg2"
+             version="1.1"
+             inkscape:version="0.91 r13725"
+             sodipodi:docname="checkout_unpressed.svg">
+            <defs
+               id="defs4" />
+            <sodipodi:namedview
+               id="base"
+               pagecolor="#ffffff"
+               bordercolor="#666666"
+               borderopacity="1.0"
+               inkscape:pageopacity="0.0"
+               inkscape:pageshadow="2"
+               inkscape:zoom="1.979899"
+               inkscape:cx="102.52111"
+               inkscape:cy="49.163212"
+               inkscape:document-units="px"
+               inkscape:current-layer="layer1"
+               showgrid="false"
+               inkscape:window-width="1366"
+               inkscape:window-height="745"
+               inkscape:window-x="-8"
+               inkscape:window-y="-8"
+               inkscape:window-maximized="1"
+               fit-margin-top="0"
+               fit-margin-left="0"
+               fit-margin-right="0"
+               fit-margin-bottom="0" />
+            <metadata
+               id="metadata7">
+              <rdf:RDF>
+                <cc:Work
+                   rdf:about="">
+                  <dc:format>image/svg+xml</dc:format>
+                  <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                  <dc:title></dc:title>
+                </cc:Work>
+              </rdf:RDF>
+            </metadata>
+            <g
+               inkscape:label="Layer 1"
+               inkscape:groupmode="layer"
+               id="layer1"
+               transform="translate(-33.071404,-6.8792697)">
+              <ellipse
+                 style="fill:#0fbe09;fill-opacity:1;fill-rule:evenodd;stroke:#0fbe09;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-6"
+                 cx="127.85712"
+                 cy="105.93362"
+                 rx="94.285713"
+                 ry="90" />
+              <ellipse
+                 style="fill:#04e719;fill-opacity:1;fill-rule:evenodd;stroke:#0fbe09;stroke-width:0.99996412px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-7"
+                 cx="133.2975"
+                 cy="89.809654"
+                 rx="94.296951"
+                 ry="89.982788"
+                 transform="matrix(0.99832113,0.05792174,-0.05795785,0.99831903,0,0)" />
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="47.44067"
+                 y="106.47327"
+                 id="text4200"
+                 sodipodi:linespacing="125%"
+                 transform="scale(0.96559993,1.0356256)"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202"
+                   x="47.44067"
+                   y="106.47327"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Check Out </tspan></text>
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="47.621239"
+                 y="104.24091"
+                 id="text4200-4"
+                 sodipodi:linespacing="125%"
+                 transform="scale(0.96559993,1.0356256)"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202-8"
+                   x="47.621239"
+                   y="104.24091"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Check Out </tspan></text>
+            </g>
+          </svg>
+        </div>
+        <div class="checkout-btn pressed">
+          <svg
+             xmlns:dc="http://purl.org/dc/elements/1.1/"
+             xmlns:cc="http://creativecommons.org/ns#"
+             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:svg="http://www.w3.org/2000/svg"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+             xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+             width="53.50127mm"
+             height="51.233936mm"
+             viewBox="0 0 189.57143 181.53757"
+             id="svg2"
+             version="1.1"
+             inkscape:version="0.91 r13725"
+             sodipodi:docname="checkout_pressed.svg">
+            <defs
+               id="defs4" />
+            <sodipodi:namedview
+               id="base"
+               pagecolor="#ffffff"
+               bordercolor="#666666"
+               borderopacity="1.0"
+               inkscape:pageopacity="0.0"
+               inkscape:pageshadow="2"
+               inkscape:zoom="1.979899"
+               inkscape:cx="102.52111"
+               inkscape:cy="49.70078"
+               inkscape:document-units="px"
+               inkscape:current-layer="layer1"
+               showgrid="false"
+               inkscape:window-width="1366"
+               inkscape:window-height="745"
+               inkscape:window-x="-8"
+               inkscape:window-y="-8"
+               inkscape:window-maximized="1"
+               fit-margin-top="0"
+               fit-margin-left="0"
+               fit-margin-right="0"
+               fit-margin-bottom="0" />
+            <metadata
+               id="metadata7">
+              <rdf:RDF>
+                <cc:Work
+                   rdf:about="">
+                  <dc:format>image/svg+xml</dc:format>
+                  <dc:type
+                     rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                  <dc:title></dc:title>
+                </cc:Work>
+              </rdf:RDF>
+            </metadata>
+            <g
+               inkscape:label="Layer 1"
+               inkscape:groupmode="layer"
+               id="layer1"
+               transform="translate(-33.071404,-15.433617)">
+              <ellipse
+                 style="fill:#0fbe09;fill-opacity:1;fill-rule:evenodd;stroke:#0fbe09;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-6"
+                 cx="127.85712"
+                 cy="105.93362"
+                 rx="94.285713"
+                 ry="90" />
+              <ellipse
+                 style="fill:#05a414;fill-opacity:1;fill-rule:evenodd;stroke:#19a214;stroke-width:0.94805247px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 id="path3336-7"
+                 cx="134.70345"
+                 cy="103.02842"
+                 rx="88.956726"
+                 ry="85.738174"
+                 transform="matrix(0.99828714,0.05850457,-0.05738044,0.99835239,0,0)" />
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="47.44067"
+                 y="112.32568"
+                 id="text4200"
+                 sodipodi:linespacing="125%"
+                 transform="scale(0.96559993,1.0356256)"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202"
+                   x="47.44067"
+                   y="112.32568"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Check Out </tspan></text>
+              <text
+                 xml:space="preserve"
+                 style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                 x="47.621239"
+                 y="110.09333"
+                 id="text4200-4"
+                 sodipodi:linespacing="125%"
+                 transform="scale(0.96559993,1.0356256)"><tspan
+                   sodipodi:role="line"
+                   id="tspan4202-8"
+                   x="47.621239"
+                   y="110.09333"
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Check Out </tspan></text>
+            </g>
+          </svg>
+        </div>
+        <div class="loglunch-btn hidden">
+            <button type="button" class="loglunch-btn btn btn-default"> 
+                <i class="icon ion-pizza size-24"></i>
+                Log Lunch Time 
+            </button>
+        </div>
       </section>
       <!-- /.content -->
     </div>
@@ -277,11 +786,13 @@
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
 <!-- Anxillary Scripts --> 
+<script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 
-<script src="{{ url_for('static', filename='js/messaging.js') }}"></script>
-
 <script src="{{ url_for('static', filename='js/intern-dashboard.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/messaging.js') }}"></script>
 
 <script>
   // Reinitializes authorization so that we

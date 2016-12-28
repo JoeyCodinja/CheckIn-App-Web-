@@ -119,7 +119,7 @@ function getFirebaseToken(){
 function redirectUser(){
     var dashboardDeterminant = window.location.origin + '/dashboard';
     getFirebaseToken().then(function(value){
-        checkUUID()
+        checkUUID(value)
         post(dashboardDeterminant, [getTokenId(), value])
     },
     function(error){
@@ -127,15 +127,18 @@ function redirectUser(){
     });
 }
 
-function checkUUID(){
+function checkUUID(firebaseToken){
     // Checks for a pc_id cookie and verifies that
     // the UUID present is a valid UUID and checks 
     // with our DBs 
     if ( storageAvailable('localStorage') ){
         // LocalStorage is available hence we can continue
-        pc_id = localStorage['pc_id']
+        var pc_id = localStorage['pc_id']
+        var submitUUID_URL = window.location.origin
         if (pc_id != undefined){
             if (testUUID(pc_id)){
+               $(submitUUID_URL, {'pc_id': pc_id,
+                                  'fbt': firebaseToken});
                return true;
             }
                 
@@ -143,11 +146,10 @@ function checkUUID(){
             // Generate and send this uuid to the 
             // server for submission
             localStorage['pc_id'] = generateUUID();
-            submitUUID_URL = window.location.origin
             $.post(submitUUID_URL, {'pc_id': localStorage['pc_id'],
-                                    'fbt': getFirebaseToken()})
+                                    'fbt': firebaseToken})
                 .done(function(data, status, jqXHR){
-                    result = true; 
+                    
                 })
                 .error(function(){
                     window.alert('UUID issue occured');

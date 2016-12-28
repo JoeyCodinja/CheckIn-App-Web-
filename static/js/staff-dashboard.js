@@ -5,6 +5,8 @@ $(document).ready(function(){
 
     $('#delete_user .modal-footer .btn-success').click(formTransmitData);
     
+    $('#assign_location .modal-footer .btn-success').click(formTransmitData);
+    
     $('.register_cancel').click(formTransmitData);
 });
 
@@ -60,126 +62,174 @@ function formTransmitData(){
             break;
         case '#add_user':
         case '#add_unregistered':
+        default: 
             action = $(modalSelector + ' form').attr('action');
             data = $(modalSelector + ' form').serializeArray();
             break;
-        default:
-            break;
     }
-    $.post(action, data, null, 'json').done(updateTableWithNewResults).fail(errorOccurred);
+    
+    console.log("Data being sent" + data);
+    
+    $.post(action, data, null, 'json')
+        .done(updateTableWithNewResults)
+        .fail(errorOccurred)
+        .always(removeModal);
 }
 
-function removeResultFromTable(email, userType){
-    // find the email in the table and remove it 
-    var INTERN = 90
-    var STAFF = 10
-    var ADMINSTAFF = 8 
-    var UNREGISTERED = 99 
-    switch(userType){
-        case INTERN:
-            email_selector = '.content section:nth-child(4)' +
-                             ' table tr:not(tr:nth-of-type(1))' + 
-                             ' td:nth-of-type(3)'
-            var emails = $(email_selector);
+function removeModal(){
+    $('.modal.in').modal('hide');
+}
+
+function removeResultFromTable(id, section){
+    id_selector = null
+    switch(section){
+        case 'INTERN':
+            id_selector = '.content section:nth-child(4)' +
+                          ' table tr:not(tr:nth-of-type(1))' + 
+                          ' td:nth-of-type(3)';
+            break; 
+        case 'STAFF': 
+            id_selector = '.content section:nth-child(6)' + 
+                          ' table tr:not(tr:nth-of-type(1))' +
+                          ' td:nth-of-type(3)';
             break;
-        case STAFF:
-            email_selector = '.content section:nth-child(6)' +
-                             ' table tr:not(tr:nth-of-type(1))' + 
-                             ' td:nth-of-type(3)'
-        case ADMINSTAFF:    
+        case 'UNREGISTERED': 
+            id_selector = '.content section:nth-child(8)' + 
+                          ' table tr:not(tr:nth-of-type(1))' + 
+                          ' td:first-of-type';
+            break; 
+        case 'PC':
+            id_selector = '.content section:nth-child(10)' +
+                          ' table tr:not(tr:nth-of-type(1))' + 
+                          ' td:first-of-type';
             break;
-        case UNREGISTERED: 
-            email_selector = '.content section:nth-child(8)' + 
-                             ' table tr:not(tr:nth-of-type(1))' + 
-                             ' td:first-of-type'
         default:
             break;
     }
-    var emails = $(email_selector);
-    for (var item=0; item<emails.length; item++){
-        if(emails[item].innerText == email){
+    
+    if (id_selector == null || id_selector == undefined)
+        window.alert("Can't retrieve rows for updated on " + section + "tables");
+    
+    var rows = $(id_selector);
+    for (var item=0; item<row.length; item++){
+        if (rows[item].innerText == id)
             $(emails[item]).parents('tr').remove();
+    }
+}
+
+function addResultToTable(data, section){
+    switch(section){
+        case 'UNREGISTERED':
+            break;
+        case 'INTERN': 
+            activeContent = getContentToUpdate(section);
+            activeContent.append(generateResultForTable(data));
+            break;
+        case 'STAFF':
+        case 'STAFFADMIN':
+            activeContent = getContentToUpdate(section);
+            activeContent.append(generateResultForTable(data));
+            break;
+        case 'PC': 
+            break;
+            activeContent = getContentToUpdate(section);
+            activeContent.append(generateResultForTable(data));
+        default:
+            break;
+    }
+}
+
+function getContentToUpdate(section){
+    var activeContentSelector = 
+        $('.content .content-header:not(.content-header.hidden)');
+    
+    isContentActive = $(activeContentSelector)[0].innerText;
+    matchArgument = null; 
+    switch(section){
+        case 'INTERN':
+            matchArgument = 'Intern';
+            break;
+        case 'STAFF':
+        case 'STAFFADMIN':
+            matchArgument = 'Staff';
+            break;
+        case 'PC':
+            matchArgument = "PC"; 
+        default:
+            break;
+    }
+    isContentActive = $(activeContentSelector)[0]
+                        .innerText.match(matchArgument) != null;
+    var activeTable;
+    if (isContentActive)
+        activeTable = $('.content .content:not(.content.hidden) tbody');
+    else{
+        activeTable = $('.content.content h1:not(.time-display)');
+        for (var items=0; items < activeTable.length; items){
+            if (activeTable[items].innerText.match(matchArgument)){
+                activeTable = $(activeTable[items]).parent()
+                activeTable = activeTable.find('+ .content.content tbody');
+                items = 99;
+            }
         }
     }
+    
+    return activeTable;
 }
 
-function addResultToTable(data){
-    // Add the result to the respective table based on userType result
-    var INTERN = 90
-    var STAFF = 10
-    var ADMINSTAFF = 8 
+function generateResultForTable(data){
+    var dataset = $('<tr>');
     
-    var dataSet = $('<tr>');
-    switch(data['userType']){
-        case INTERN:
-            var activeContentSelector = '.content .content-header:not(.content-header.hidden)'
-            var contentActive = $(activeContentSelector)[0].innerText.match('Intern');
-            if ( contentActive != null ){
-                var activeTableSelector = '.content .content:not(.hidden) table tbody';
-                
-            } else{
-                var activeTableSelector = '.content .content h1:not(.time-display)';
-                for (var items=0; items < activeTableSelector.length; items){
-                    if (activeTableSelector[items].innerText.match('Intern')){
-                        activeTableSelector = $(activeTableSelector[items]);
-                        items = 99;
-                    }
-                }
-            }
-            
-            for (var items=0; items < Object.keys(data).length; items++){
-                    var tableData = $('<td>');
-                    console.log(Object.keys(data)[items]);
-                    tableData.text(data[Object.keys(data)[items]])
-                    dataSet.append(tableData);
-            }
-            $(activeTableSelector).append(dataSet);
-            break;
-            
-        case STAFF:
-        case ADMINSTAFF: 
-            var activeContentSelector = '.content .content-header:not(.content-header.hidden)'
-            var contentActive = $(activeContentSelector)[0].innerText.match('Staff');
-            if ( contentActive != null ){
-                var activeTableSelector = '.content .content:not(.content-header.hidden table tbody';
-                
-            } else{
-                var activeTableSelector = '.content .content h1:not(.time-display)';
-                for (var items=0; items < activeTableSelector.length; items){
-                    if (activeTableSelector[items].innerText.match('Staff')){
-                        activeTableSelector = $(activeTableSelector[items]);
-                        items = 99;
-                    }
-                }
-            }
-            
-            for (var items=0; items < Object.keys(data).length; items++){
-                    var tableData = $('<td>');
-                    console.log(Object.keys(data)[items]);
-                    tableData.text(data[Object.keys(data)[items]])
-                    dataSet.append(tableData);
-            }
-            $(activeTableSelector).append(dataSet);
-            
-            break;
-        default:
-            break;
+    for (var items=0; items < Object.keys(data).length; items++){
+        var tableData = $('<td>');
+        console.log(Object.keys(data)[items]);
+        tableData.text(data[Object.keys(data)[items]])
+        dataSet.append(tableData);
     }
+    
+    return dataset; 
 }
 
 function updateTableWithNewResults(data){
-    if (Object.keys(data).includes('register')){
-        addResultToTable(data['register'])
-    } else if(Object.keys(data).includes('delete')){
-        removeResultFromTable(
-            data['delete']['email'], 
-            data['delete']['userType'])
-    } else if(Object.keys(data).includes('error')){
-        // Display an error modal that shows 
+    switch(data){
+        case Object.keys(data).includes('register'):
+            var section = null
+            if (data['register']['userType'] == 99) 
+                section = "UNREGISTERED"
+            else if (data['register']['userType'] == 90)
+                section = "INTERN"
+            else if (data['register']['userType'] == 10)
+                section = "STAFF"
+            else if (data['register']['userType'] == 8)
+                section = "STAFFADMIN"
+            
+            addResultToTable(data['register'], section);
+            break;
+        case Object.keys(data).includes('location_assigned'):
+            addResultToTable(data['location_assigned'], 'PC')
+            break;
+        case Object.keys(data).includes('delete'):
+            var userType = data['delete']['userType']
+            var isIntern = userType == 90 
+            var isStaff = userType == 10 || userType == 8 
+            var isUnregistered = userType == 99 
+            if (isIntern) 
+                removeResultFromTable(data['delete']['email'], 'INTERN')
+            else if (isStaff)
+                removeResultFromTable(data['delete']['email'], 'STAFF')
+            else if (isUnregistered)
+                removeResultFromTable(data['delete']['email'], 'UNREGISTERED')
+            else
+                window.alert('Incompatible Type Found')
+                
+            break;
+        case Object.keys(data).includes('location_unassigned'):
+            break; 
+        default: 
+            break;
     }
-    
 }
 
 function errorOccurred(){
-    
+    window.alert("There seems to have been an error, please refresh your browser or report the problem");
 }

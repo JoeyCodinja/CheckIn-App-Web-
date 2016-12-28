@@ -1,17 +1,26 @@
-from flask import Flask, redirect, request, jsonify
+from flask import Flask, redirect, request, jsonify, make_response
 from flask import render_template
 import os
 import json
+from datetime import datetime
 from models.Database import Database
 from models.Intern import Intern 
 from models.Staff import Staff
 from models.Unregistered import Unregistered
 from models.PCLocations import PCLocations 
+from models.Log import Log
 from requests import HTTPError
 from punchin_utils import Utils
+from utils.fcm import FCM_HTTP, FCM_XMPP
+
+from pprint import pprint
 
 web_app = Flask(__name__)
 database = Database()
+# xmpp = FCM_XMPP()
+# xmpp.connect()
+# xmpp.process(block=False)
+fcm_http = FCM_HTTP()
 
 # Contstants
 #   User Types
@@ -123,21 +132,24 @@ def store_uuid():
         # Since the user hasn't ever registered 
         # this computer, lets go ahead and 
         # register it
-        data_ts = dict(undefined=[generated_uuid])
+        data_ts = dict(UREG=[generated_uuid])
         if database.query('/pc_locations', token=fbt) == None: 
             # pc_locations section doesn't exist
             database.insert('/', {'pc_locations': data_ts}, token=fbt)
         else: 
-            undefined_list = database.query('/pc_locations/undefined', token=fbt)
+            undefined_list = database.query('/pc_locations', token=fbt)
+            
+            
+            pprint( "Undefined PC Location List" + str(undefined_list))
+            
             print "Retreieved of undefined systems" + str(undefined_list)
             if undefined_list == None: 
-                database.insert('/pc_locations', data_ts)
+                database.put('/pc_locations', 'UDEF', data_ts['UDEF'])
             else: 
                 undefined_list.append(generated_uuid)
-                database.put('/pc_locations','undefined', undefined_list)
+                database.put('/pc_locations','UDEF', undefined_list)
     else: 
-        # Return an 'error' screen; system already sent its UUID
-        pass
+        return jsonify(True)
     
     return jsonify(True)
     
@@ -153,7 +165,7 @@ def dashboard(data):
         if is_intern(email, data):
             if is_preregistered(email): 
                 validate_user(email)
-            intern_dash = redirect('/dashboard/intern')
+            intern_dash = redirect('https://checkin-appuwi-codeinja.c9users.io/dashboard/intern')
             response = web_app.make_response(intern_dash)
             response.set_cookie('userId', value=cookie_user_id)
             response.set_cookie('token', value=data['token'])
@@ -162,7 +174,7 @@ def dashboard(data):
         elif is_staff(email, data):
             if is_preregistered(email):
                 validate_user(email)
-            staff_dash = redirect('/dashboard/staff')
+            staff_dash = redirect('https://checkin-appuwi-codeinja.c9users.io/dashboard/staff')
             response = web_app.make_response(staff_dash)
             response.set_cookie('userId', value=cookie_user_id)
             response.set_cookie('token', value=data['token'])
@@ -190,6 +202,7 @@ def staff_dashboard():
     
     
     return render_template("staff.html", 
+                           valid_locations = PCLocations.valid_locations,
                            user_listing=user_listing , 
                            unregistered_listing=unregistered_listing,
                            pc_locations=pc_locations)
@@ -233,6 +246,9 @@ def staff_update():
 @signin_required
 def assign_system():
     # UUIDs for a particular location are added based on user request
+    
+    import pdb; pdb.set_trace()
+    
     location = request.form['location']
     uuid = request.form['uuid']
     
@@ -240,7 +256,9 @@ def assign_system():
     pc_locations_exist = database.query('/pc_locations')
     if pc_locations_exist is None: 
         database.insert('/pc_locations', {location:[uuid]})
-        return jsonify(uuid)
+        return jsonify({'location_assigned': 
+                            {'location': location, 
+                             'uuid': uuid}})
     
     created_previously = database.query('/pc_locations/'+ str(location))
     
@@ -249,14 +267,15 @@ def assign_system():
         # a list of the UUIDs assigned to this location
         created_previously.append(uuid)
         database.put('/pc_locations', location, created_previously)
-        
     else:
         # We have to create the location given to us as well as input the uuid 
         # for this specific location
         database.put('/pc_locations', location, [uuid])
         
         
-    return jsonify(uuid)
+    return jsonify({'location_assigned': 
+                        {'uuid': uuid,
+                         'location': location}})
     
 @web_app.route('/dashboard/unassign_location', methods=['POST'])
 @signin_required
@@ -267,17 +286,22 @@ def unassign_system():
 
     pc_locations = database.query('/pc_location')
     for location in pc_locations:
-        if location == 'undefined':
-            # Disregard because PC is already unregistered 
-            return jsonify(False)
-        
-        if uuid in pc_locations[location]:
+        location_member = uuid in pc_locations[location]
+        unregistered_section = location == PCLocations.Unregistered
+        if location_member and not unregistered_section:
+            # Remove the UUID of the PC from the 
+            # previously assigned location and 
+            # append it to the unaassigned list
             pc_locations[location].remove(uuid)
-            break
+            pc_locations[PCLocations.Unregistered].append(uuid)
+            return jsonify({'location_unassigned': {'uuid': uuid}})
+        elif location_member and unregistered_section:
+            # Wasn't unassigned because it was already unassigned
+            return jsonify(False)
+        else: 
+            continue
     
-    database.insert('/pc_location', pc_locations)
-    
-    return jsonify(True)
+    return jsonify({'error': 'uuid was not found'})
     
 @web_app.route('/dashboard/register', methods=["POST"])
 @admin_required
@@ -328,6 +352,95 @@ def cancel_unregistered():
                                'userType': UNREGISTERED }
                    })
 
+@web_app.route('/dashboard/subscribe', methods=["POST"])
+@login_required
+def subscribe():
+    params = request.form
+    result = fcm_http.topic_subscribe(params['fcm_iid'], params['user'])
+    
+    # After subscription tag the registration key to this users information 
+    user_email = validate_token(request.cookies['token'])
+    user_email = user_email['googleUserObject']['email']
+    user_email = escape_email_id(user_email)
+    user_email = user_email.split('@')[0]
+    
+    data = {'web_app': params['fcm_iid']}
+    
+    database.put('/user/%s' % user_email, 'FCM_ID', data=data)
+
+    
+    return jsonify(result)
+
+@web_app.route('/dashboard/messaging/android')
+def message_android():
+    pass 
+
+@web_app.route('/dashboard/messaging/web', methods=["POST"])
+@login_required
+def message_web():
+    INTERN_METHODS = ['checkin', 'checkout', 
+                      'lunchstart', 'lunchend',]
+    INTERN_MAPPING = {
+        INTERN_METHODS[0] : Log.ARRIVE,
+        INTERN_METHODS[1] : Log.LEAVE,
+        INTERN_METHODS[2] : Log.LUNCH,
+        INTERN_METHODS[3] : Log.LUNCH
+    }
+    
+    STAFF_METHODS = ['confirm', 'registering',]
+    
+    STAFF_MAPPING = {
+        STAFF_METHODS.index('confirm'): Log.CONFIRM
+    }
+    
+    SYSTEM_METHODS = ['unregistered']
+    
+    message_info = request.form.to_dict()
+    
+    if str(message_info['method']) in INTERN_MAPPING:
+        MAPPING = INTERN_MAPPING
+    elif str(message_info['method']) in STAFF_MAPPING:
+        MAPPING = STAFF_MAPPING
+    elif str(message_info['method']) in SYSTEM_METHODS:
+        MAPPING = dict(map(lambda x : (x, x), SYSTEM_METHODS))
+    else:
+        error = json.dumps({'error': 'invalid messaging method:%s' % request.form['method']})
+        response = make_response(error, 400)
+        return response 
+        
+    log_type = MAPPING[message_info['method']]
+        
+    del message_info['method']
+    
+    if log_type == Log.LUNCH: 
+        fcm_http.send_topic_message(INTERN_MAPPING[message_info['method']], message_info)
+         
+    if log_type == Log.ARRIVE:
+        # Get the user's ID; 
+        # send the message out arrive topic;
+        # Log to FDB
+        user = get_uid(request.cookies['token'])
+        message_info.update({'u_id': user})
+        
+        log_id = fcm_http.send_topic_message(log_type, message_info)
+        log = Log(log_id, log_type, user)
+        log.to_db(database)
+        
+    elif log_type == Log.CONFIRM:
+        user_to_notify = database.query('/log', message_info['lid'])['from']
+        user_to_notify = get_fcm_iids(INTERN, aux_id=user_to_notify)
+        Log.from_db(database, message_info['lid'])
+        
+    elif log_type in SYSTEM_METHODS:
+        pass 
+    
+    
+    return jsonify(True)
+
+@web_app.route('/dashboard/messaging/ios')
+def message_ios():
+    pass
+
 def validate_user(email):
     # Users are validated on their first 
     # login after they have been granted 
@@ -355,13 +468,16 @@ def validate_token(g_token):
         # Invalid token
         pass
     
-    return_data['userId'] = id_info['sub']
-    return_data['token'] = g_token
-    return_data['googleUserObject']\
-        .update(email=id_info['email'], 
-                name=id_info['name'], 
-                picture=id_info['picture'])
-    
+    try:
+        return_data['userId'] = id_info['sub']
+        return_data['token'] = g_token
+        return_data['googleUserObject']\
+            .update(email=id_info['email'], 
+                    name=id_info['name'], 
+                    picture=id_info['picture'])
+    except (TypeError, IndexError):
+        raise ValueError('Token passed is invalid')
+        
     return return_data
     
 def is_intern(email, data):
@@ -407,7 +523,14 @@ def is_preregistered(email):
     except (HTTPError, KeyError): 
         return False
     
+def get_uid(token):
+    user = validate_token(token)['googleUserObject']['email']
+    user = user.split('@')[0]
+    user = database.query('/user/%s' % escape_email_id(user))
+    return user['id']
+
 def submit_unregistered_user(data, user_data=None):
+    # TODO send a 
     from datetime import datetime
     basicGoogleProfile = data['googleUserObject']
     
@@ -427,7 +550,34 @@ def submit_unregistered_user(data, user_data=None):
         structure = {'unregistered': structure}
         database.insert(None, structure)
     else:
-        database.insert('/unregistered', structure)
+        database.put('/unregistered', 
+                     basicGoogleProfile['email'],
+                     structure[basicGoogleProfile['email']])
+
+def get_fcm_iids(userType, user_id=None, aux_id=None):
+        if user_id is not None:
+            user = database.query('/user/%s' % user_id)
+            try:
+                return user['FCM_ID']['web_app']
+            except IndexError:
+                raise ValueError('User has not been registered with Firebase as yet')
+        
+        if aux_id is not None:
+            users = database.query('/user')
+            for user in users:
+                if users[user]['id'] == aux_id:
+                    return users[user]['FCM_ID']['web_app']
+            
+        users = database.query('/user').keys()
+        personnel_ids = []
+        for user in users:
+            query_user = database.query('/user', user)
+            fcm_iid_notnull = query_user['FCM_ID']['web_app'] != ' '
+            isUserType = int(query_user['userType']) ==  userType
+            
+            if fcm_iid_notnull and isUserType: 
+                personnel_ids.append(query_user['FCM_ID']['web_app'])
+        return personnel_ids
 
 def escape_email_id(email):
     import re 
@@ -462,4 +612,5 @@ def parse_email_id(escaped_email):
 
 if __name__ == "__main__":
     web_app.config.debug = True
+    
     web_app.run(os.getenv('IP', '0.0.0.0'), os.getenv('PORT', 8080))

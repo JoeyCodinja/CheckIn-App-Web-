@@ -2,8 +2,8 @@
 // to the navigation around both 
 // the staff and intern dashboard 
 
-var STAFF_DASHBOARD = 20 
-var INTERN_DASHBOARD = 22
+var STAFF_DASHBOARD = 10
+var INTERN_DASHBOARD = 90
 
 var contentViewLinks = $('.sidebar-menu :not(.treeview) a'); 
 
@@ -27,28 +27,33 @@ function switchContentView(contentView){
         // Show the content list click on, remove all the rest
         case "Intern CheckIn":
             contentIndices = [0, 1]
-            antiContentIndices = [2, 3, 4, 5, 6, 7]
+            antiContentIndices = [2, 3, 4, 5, 6, 7, 8, 9]
             showContentView(contentIndices);
             hideContentView(antiContentIndices);
             break;
         case "Staff":
             contentIndices = [4, 5];
-            antiContentIndices = [0, 1, 2, 3, 6, 7];
+            antiContentIndices = [0, 1, 2, 3, 6, 7, 8, 9];
             showContentView(contentIndices);
             hideContentView(antiContentIndices);
             break;
         case "Intern":
             contentIndices = [2, 3]
-            antiContentIndices = [0, 1, 4, 5, 6, 7]
+            antiContentIndices = [0, 1, 4, 5, 6, 7, 8, 9]
             showContentView(contentIndices);
             hideContentView(antiContentIndices);
             break;
         case "Unregistered":
             contentIndices = [6, 7]
-            antiContentIndices = [0, 1, 2, 3, 4, 5]
+            antiContentIndices = [0, 1, 2, 3, 4, 5, 8, 9]
             showContentView(contentIndices);
             hideContentView(antiContentIndices);
             break;
+        case "System Location Management":
+            contentIndicies = [8, 9];
+            antiContentIndicies = [0, 1, 2, 3, 4, 5, 6, 7,];
+            showContentView(contentIndicies);
+            hideContentView(antiContentIndicies);
         default:
             break;
     }
@@ -85,11 +90,10 @@ $('.btn[data-target*=add_user]').click(function(){
     
 })
 
-
 $('.btn[data-target*=add_unregistered]').click(function(){
   var button = $(this);
   
-  var dataRow = $('td:not(td:nth-of-type(3))', $(button).parents('tr'));
+  var dataRow = $('td:not(td:nth-of-type(3), td:nth-of-type(4))', $(button).parents('tr'));
   var email = dataRow[0].innerText
   var name = dataRow[1].innerText.split(' ');
  
@@ -100,3 +104,14 @@ $('.btn[data-target*=add_unregistered]').click(function(){
   
   $('#inputEmail, #inputFirstName, #inputLastName').attr('readonly', true);
 })  
+
+$('.btn[data-target*=assign_location]').click(function(){
+    var button = $(this);
+    
+    var dataRow = $('td:not(td:nth-of-type(3))', $(button).parents('tr')); 
+    var uuid = dataRow[0].innerText;
+    
+    var modal = $('#assign_location');
+    modal.find('#pc_id').val(uuid);
+    $(modal.find('#pc_id')).attr('readonly',true);
+})

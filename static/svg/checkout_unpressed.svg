@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="53.504444mm"
+   height="53.496449mm"
+   viewBox="0 0 189.58268 189.55434"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="checkout_unpressed.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="102.52111"
+     inkscape:cy="49.163212"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="745"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-33.071404,-6.8792697)">
+    <ellipse
+       style="fill:#0fbe09;fill-opacity:1;fill-rule:evenodd;stroke:#0fbe09;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-6"
+       cx="127.85712"
+       cy="105.93362"
+       rx="94.285713"
+       ry="90" />
+    <ellipse
+       style="fill:#04e719;fill-opacity:1;fill-rule:evenodd;stroke:#0fbe09;stroke-width:0.99996412px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3336-7"
+       cx="133.2975"
+       cy="89.809654"
+       rx="94.296951"
+       ry="89.982788"
+       transform="matrix(0.99832113,0.05792174,-0.05795785,0.99831903,0,0)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="47.44067"
+       y="106.47327"
+       id="text4200"
+       sodipodi:linespacing="125%"
+       transform="scale(0.96559993,1.0356256)"><tspan
+         sodipodi:role="line"
+         id="tspan4202"
+         x="47.44067"
+         y="106.47327"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC'">Check Out </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:34.74407578px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="47.621239"
+       y="104.24091"
+       id="text4200-4"
+       sodipodi:linespacing="125%"
+       transform="scale(0.96559993,1.0356256)"><tspan
+         sodipodi:role="line"
+         id="tspan4202-8"
+         x="47.621239"
+         y="104.24091"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Eras Demi ITC';-inkscape-font-specification:'Eras Demi ITC';fill:#ffffff;fill-opacity:1">Check Out </tspan></text>
+  </g>
+</svg>
