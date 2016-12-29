@@ -75,7 +75,10 @@
                 <li class="user-footer">
                   
                   <div class="pull-right">
-                    <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                    <a onclick="signOut()"
+                       class="btn btn-default btn-flat">
+                      Sign out
+                    </a>
                   </div>
                 </li>
               </ul>
@@ -129,12 +132,38 @@
 </div>
 <!-- ./wrapper -->
 
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <!-- jQuery 2.2.3 -->
 <script src="{{ url_for('static', filename='js/plugins/jquery-2.2.3.min.js') }}"></script>
 <!-- Bootstrap 3.3.6 -->
 <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ url_for('static', filename='js/AdminLTE/app.min.js') }}"></script>
+
+<!-- Firebase Initialization --> 
+<script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-auth.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBLOhr2voKEhut0Vch6tDQGiSLiwiy26vo",
+    authDomain: "checkinapp-148816.firebaseapp.com",
+  }; 
+  firebase.initializeApp(config);
+</script>
+
+
+<!-- Anxillary Scripts -->
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+<script> 
+  // Reinitializes authorization so that we know 
+  // if the user is still logged in or not 
+  // Wait a few seconds to get severything to load first
+  setTimeout(reinitializeAuth, 3000);
+</script>
 </body>
 </html>
     
