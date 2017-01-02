@@ -40,6 +40,7 @@ NO_CONFIRM = "NORESP"
 ERROR_NO_TOKEN = 'NOTOKEN'
 ERROR_NO_USERINFO = 'NOUSERINFO'
 ERROR_USER_INDETERMINATE = 'NOTVALIDUSER'
+
 # --Error responses--
 ERROR_NOT_ADMIN = "NOTADMIN"
 
@@ -91,9 +92,6 @@ def admin_required(f):
             # Return admin is required status to frontend
     return has_admin_cred
 
-
-
-
 # Error views and methods
 @web_app.route('/ooops')    
 def generate_error_template(error_type=None):
@@ -123,19 +121,26 @@ def store_uuid():
     # already been set if not, check if a UUID 
     # has been sent and submit it to our DBs 
     # for further checks
+    def find_uuid(uuid):
+        result = database.query('/pc_locations')
+        for location in result:
+            for pc in result[location]:
+                if pc == uuid:
+                    return True
+        return None
+                    
     generated_uuid = request.form['pc_id']
     fbt = request.form['fbt']
-    result = database.query('/pc_locations', 
-                            generated_uuid, 
-                            token=fbt)
+    result = find_uuid(generated_uuid)
+                            
     if result == None: 
         # Since the user hasn't ever registered 
         # this computer, lets go ahead and 
         # register it
-        data_ts = dict(UREG=[generated_uuid])
+        data_ts = dict(UDEF=[generated_uuid])
         if database.query('/pc_locations', token=fbt) == None: 
             # pc_locations section doesn't exist
-            database.insert('/', {'pc_locations': data_ts}, token=fbt)
+            database.put('/', 'pc_locations', data_ts, token=fbt)
         else: 
             undefined_list = database.query('/pc_locations', token=fbt)
             
@@ -390,7 +395,7 @@ def message_web():
     STAFF_METHODS = ['confirm', 'registering',]
     
     STAFF_MAPPING = {
-        STAFF_METHODS.index('confirm'): Log.CONFIRM
+        STAFF_METHODS[0]: Log.CONFIRM
     }
     
     SYSTEM_METHODS = ['unregistered']
@@ -408,30 +413,30 @@ def message_web():
         response = make_response(error, 400)
         return response 
         
-    log_type = MAPPING[message_info['method']]
-        
-    del message_info['method']
+    message_info = MAPPING[message_info['method']]
     
-    if log_type == Log.LUNCH: 
+    if message_info['method'] == Log.LUNCH: 
         fcm_http.send_topic_message(INTERN_MAPPING[message_info['method']], message_info)
          
-    if log_type == Log.ARRIVE:
+    if message_info['method'] == Log.ARRIVE:
         # Get the user's ID; 
         # send the message out arrive topic;
         # Log to FDB
-        user = get_uid(request.cookies['token'])
-        message_info.update({'u_id': user})
+        user = get_uid_name(request.cookies['token'])
+        message_info.update({'u_id': user[0], 'name': user[1]})
         
-        log_id = fcm_http.send_topic_message(log_type, message_info)
-        log = Log(log_id, log_type, user)
+        log_id = fcm_http.send_topic_message(message_info['method'], message_info)
+        log = Log(log_id, message_info['method'], user[0])
         log.to_db(database)
         
-    elif log_type == Log.CONFIRM:
-        user_to_notify = database.query('/log', message_info['lid'])['from']
+    elif message_info['method'] == Log.CONFIRM:
+        user_to_notify = message_info['u_id']
         user_to_notify = get_fcm_iids(INTERN, aux_id=user_to_notify)
+        for user in user_to_notify:
+            fcm_http.send_message(user, )
         Log.from_db(database, message_info['lid'])
         
-    elif log_type in SYSTEM_METHODS:
+    elif message_info['method'] in SYSTEM_METHODS:
         pass 
     
     
@@ -519,15 +524,15 @@ def is_preregistered(email):
     email = escape_email_id(email.split('@')[0])
     try:
         result = database.query('/user', email)
-        return not result['email']['isValidated']
+        return not result['isValidated']
     except (HTTPError, KeyError): 
         return False
     
-def get_uid(token):
+def get_uid_name(token):
     user = validate_token(token)['googleUserObject']['email']
     user = user.split('@')[0]
     user = database.query('/user/%s' % escape_email_id(user))
-    return user['id']
+    return user['id'], user['name']
 
 def submit_unregistered_user(data, user_data=None):
     # TODO send a 
@@ -548,7 +553,7 @@ def submit_unregistered_user(data, user_data=None):
     
     if database.query('/unregistered') == None:
         structure = {'unregistered': structure}
-        database.insert(None, structure)
+        database.put('/', 'unregistered', structure)
     else:
         database.put('/unregistered', 
                      basicGoogleProfile['email'],
