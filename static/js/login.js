@@ -137,7 +137,7 @@ function checkUUID(firebaseToken){
         var submitUUID_URL = window.location.origin
         if (pc_id != undefined){
             if (testUUID(pc_id)){
-               $(submitUUID_URL, {'pc_id': pc_id,
+               $.post(submitUUID_URL, {'pc_id': pc_id,
                                   'fbt': firebaseToken});
                return true;
             }

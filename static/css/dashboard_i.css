@@ -6,3 +6,19 @@
 .pressed{ 
     display:none;
 } 
+
+.loglunchend-btn .icon.ion-pizza{
+    color: yellow;
+}
+    
+.lunch_timer.final{ 
+    animation-name:twoblink;
+    animation-duration:2s;
+    animation-iteration-count:2;
+    
+}
+
+@keyframes twoblink{
+    from:   {opacity: 0.5;}
+    to:     {opacity: 1;  } 
+}

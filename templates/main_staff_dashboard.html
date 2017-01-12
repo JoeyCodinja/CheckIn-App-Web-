@@ -10,23 +10,43 @@
     </h1>
 </section>
 <section class="content">
-    <div class="row">
-        <section class="col-lg-12">
-            <div class="box box-success">
-                <!-- Showing arrival of interns --> 
-                <div class="box-header with-border">
-                    <h3 class="box-title">Present</h3>
-                    <div class="box-tools pull-right">
+    <div class="box box-success">
+        <!-- Showing arrival of interns --> 
+        <div class="box-header with-border">
+            <h3 class="box-title">Present</h3>
+            <div class="box-tools pull-right">
+                <button type="button" 
+                        class="btn btn-box-tool" 
+                        data-widget="collapse">
+                    <i class="fa fa-minus"></i></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                {% for log in logs%}
+                {% endfor %} 
+            </div>
+        </div>
+    </div>
+    <div class="box box-warning">
+        <!-- Showing interns that have checked in and are awaiting confirmation --> 
+        <div class="box-header with-border">
+            <h3 class="box-title">Checked In</h3>
+            <div class="box-tools pull-right">
                         <button type="button" 
                                 class="btn btn-box-tool" 
                                 data-widget="collapse">
                             <i class="fa fa-minus"></i></i>
                         </button>
                     </div>
-                </div>
-                <div class="box-body"></div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                {% for log in logs%}
+                {% endfor %} 
             </div>
-        </section>
+        </div>
     </div>
     <div class="box box-danger">
         <!-- Showing interns at lunch -->
@@ -40,7 +60,12 @@
                         </button>
                     </div>
         </div>
-        <div class="box-body"></div>
+        <div class="box-body">
+            <div class="row">
+                {% for log in logs%}
+                {% endfor %} 
+            </div>
+        </div>
     </div>
     <div class="box box-primary">
         <!-- Showing interns that have checked out for the day --> 
@@ -54,7 +79,12 @@
                         </button>
                     </div>
         </div>
-        <div class="box-body"></div>
+        <div class="box-body">
+            <div class="row">
+                {% for log in logs%}
+                {% endfor %} 
+            </div>
+        </div>
     </div>
 </section>
 {%- endmacro %}

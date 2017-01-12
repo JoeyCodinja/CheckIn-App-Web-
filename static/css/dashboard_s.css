@@ -1,0 +1,10 @@
+.small-box .icon {
+    color: white;
+    font-style:normal;
+    font-size: 20px;
+    margin-top: 65px;
+}
+
+.small-box .icon:hover{
+    font-size: 25px;
+}

@@ -94,8 +94,18 @@ def admin_required(f):
 
 # Error views and methods
 @web_app.route('/ooops')    
-def generate_error_template(error_type=None):
-    return render_template('error.html', error_type=error_type)
+def generate_error_template(error_type=None, data=None):
+    render_args = {}
+    
+    if error_type is not None:
+        render_args.update({'error_type': error_type})
+                   
+    if data is not None:
+        user = data['googleUserObject']
+        render_args.update({'user_name': user['name']})
+        render_args.update({'user_picture': user['picture']})
+    
+    return render_template('error.html', **render_args)
     
 def error_response(error_type=None):
     from flask import jsonify
@@ -128,6 +138,14 @@ def store_uuid():
                 if pc == uuid:
                     return True
         return None
+    
+    def transform_list(alist):
+        transform_result = dict()
+        for item in alist: 
+            transform_result.update({alist.index(item): item})
+        return transform_result
+        
+            
                     
     generated_uuid = request.form['pc_id']
     fbt = request.form['fbt']
@@ -142,17 +160,17 @@ def store_uuid():
             # pc_locations section doesn't exist
             database.put('/', 'pc_locations', data_ts, token=fbt)
         else: 
-            undefined_list = database.query('/pc_locations', token=fbt)
-            
+            undefined_list = database.query('/pc_locations/UDEF', token=fbt)
             
             pprint( "Undefined PC Location List" + str(undefined_list))
             
             print "Retreieved of undefined systems" + str(undefined_list)
             if undefined_list == None: 
-                database.put('/pc_locations', 'UDEF', data_ts['UDEF'])
+                database.put('/pc_locations', 'UDEF', data_ts['UDEF'], token=fbt)
             else: 
-                undefined_list.append(generated_uuid)
-                database.put('/pc_locations','UDEF', undefined_list)
+                if generated_uuid not in undefined_list: 
+                    undefined_list.append(generated_uuid)
+                    database.put('/pc_locations','UDEF', transform_list(undefined_list), token=fbt)
     else: 
         return jsonify(True)
     
@@ -186,31 +204,43 @@ def dashboard(data):
             return response
         else:
             submit_unregistered_user(data)
-            return generate_error_template(ERROR_USER_INDETERMINATE)
+            return generate_error_template(ERROR_USER_INDETERMINATE, data)
 
     return generate_error_template(ERROR_NO_USERINFO)
         
 @web_app.route('/dashboard/intern')
+@login_required
 def intern_dashboard():
-    return render_template("intern.html")
+    intern_uid_name_picture = get_uid_name(request.cookies['token'])
+    
+    return render_template("intern.html",
+                           user_id = {'name': intern_uid_name_picture[1],
+                                      'picture': intern_uid_name_picture[2]},
+                           )
 
 @web_app.route('/dashboard/staff')
+@login_required
 def staff_dashboard():
     user_listing = {'staff': [], 'intern': []}
     unregistered_listing = []
     pc_locations = []
     
+    staff_uid_name = get_uid_name(request.cookies['token'])
+    
     user_listing['staff'] = Staff.from_db(database)
     user_listing['intern'] = Intern.from_db(database)
     unregistered_listing =  Unregistered.from_db(database)
+    logs = Log.from_db(database, staff_uid_name[0])
     pc_locations = PCLocations.from_db(database)
     
-    
     return render_template("staff.html", 
+                           user_id         = {'name':staff_uid_name[1], 
+                                              'picture': staff_uid_name[2]},
                            valid_locations = PCLocations.valid_locations,
-                           user_listing=user_listing , 
+                           user_listing    = user_listing, 
                            unregistered_listing=unregistered_listing,
-                           pc_locations=pc_locations)
+                           pc_locations    = pc_locations,
+                           logs            = logs)
     
 @web_app.route('/dashboard/intern/update')
 def intern_update():
@@ -364,6 +394,9 @@ def subscribe():
     result = fcm_http.topic_subscribe(params['fcm_iid'], params['user'])
     
     # After subscription tag the registration key to this users information 
+    
+    print "fcm_iid %s " % params['fcm_iid'] 
+    
     user_email = validate_token(request.cookies['token'])
     user_email = user_email['googleUserObject']['email']
     user_email = escape_email_id(user_email)
@@ -413,11 +446,23 @@ def message_web():
         response = make_response(error, 400)
         return response 
         
-    message_info = MAPPING[message_info['method']]
+    message_info['method'] = MAPPING[message_info['method']]
     
     if message_info['method'] == Log.LUNCH: 
-        fcm_http.send_topic_message(INTERN_MAPPING[message_info['method']], message_info)
-         
+        user = get_uid_name(request.cookies['token'])
+        message_info.update({'u_id': user[0]})
+        fcm_http.send_topic_message(message_info['method'], message_info)
+        
+        log = Log.from_db(database, user[0], user[0])
+        if str(log.lunch_data['start']) != 'null':
+            # This is a lunchend message
+            log.end_lunch()
+        else:
+            # this is a lunchstart message
+            log.start_lunch() 
+        log.to_db(database)
+        return jsonify(True)
+        
     if message_info['method'] == Log.ARRIVE:
         # Get the user's ID; 
         # send the message out arrive topic;
@@ -432,14 +477,31 @@ def message_web():
     elif message_info['method'] == Log.CONFIRM:
         user_to_notify = message_info['u_id']
         user_to_notify = get_fcm_iids(INTERN, aux_id=user_to_notify)
-        for user in user_to_notify:
-            fcm_http.send_message(user, )
-        Log.from_db(database, message_info['lid'])
+        staff = get_uid_name(request.cookies['token'])[0]
+        if isinstance(user_to_notify, list):
+            for user in user_to_notify:
+                # Check to see if there 
+                result = fcm_http.send_message(user, message_info)
+                if isinstance(result, dict) and 'error' in result:
+                    return result
+        elif isinstance(user_to_notify, (str, unicode)):
+            # Check to see if there
+            # is an error here before 
+            # we move forward
+            result = fcm_http.send_message(user_to_notify, message_info)
+            if isinstance(result, dict) and 'error' in result: 
+                return result
+        log = Log.from_db(database, staff, message_info['u_id'])
+        log.confirm_log(database, staff, datetime.now().time().isoformat()[:8])\
+           .to_db(database)
+    elif message_info['method'] == Log.LEAVE: 
+        user = get_uid_name(request.cookies['token'])
+        message_info.update({'u_id': user[0]})
+        fcm_http.send_topic_message(message_info['method'], message_info)
+        log = Log.from_db(database, user[0], user[0])
+        log.depart()
+        log.to_db(database)
         
-    elif message_info['method'] in SYSTEM_METHODS:
-        pass 
-    
-    
     return jsonify(True)
 
 @web_app.route('/dashboard/messaging/ios')
@@ -452,6 +514,7 @@ def validate_user(email):
     # access by being added to the table of
     # personnel
     email = escape_email_id(email)
+    database.delete('/unregistered', email.split('@')[0])
     return database.put('/user', email.split('@')[0], {'isValidated': True});
 
 def validate_token(g_token):
@@ -529,10 +592,12 @@ def is_preregistered(email):
         return False
     
 def get_uid_name(token):
-    user = validate_token(token)['googleUserObject']['email']
+    user = validate_token(token)['googleUserObject']
+    picture = user['picture']
+    user = user['email']
     user = user.split('@')[0]
     user = database.query('/user/%s' % escape_email_id(user))
-    return user['id'], user['name']
+    return user['id'], user['name'], picture
 
 def submit_unregistered_user(data, user_data=None):
     # TODO send a 
@@ -549,10 +614,7 @@ def submit_unregistered_user(data, user_data=None):
         structure[basicGoogleProfile['email']]\
             .update(('proposedId', user_data['id']))
             
-    print database.query(None)
-    
     if database.query('/unregistered') == None:
-        structure = {'unregistered': structure}
         database.put('/', 'unregistered', structure)
     else:
         database.put('/unregistered', 
@@ -594,9 +656,7 @@ def escape_email_id(email):
         print invalid_character
         email = email.replace(invalid_character, '!%03d!' % ord(invalid_character), 1)
         search_obj = re.search(invalid_characters, email)
-    
-    print email
-    
+
     return email
     
 def parse_email_id(escaped_email):

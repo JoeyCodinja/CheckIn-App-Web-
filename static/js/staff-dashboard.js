@@ -233,3 +233,114 @@ function updateTableWithNewResults(data){
 function errorOccurred(){
     window.alert("There seems to have been an error, please refresh your browser or report the problem");
 }
+
+function createBox(data){
+    var box = '<div class="col-lg-3 col-xs-6">' +
+            '<div class="small-box bg-aqua">' + 
+            '<div class="inner">' +
+            '<h3>..user_name..</h3>' + 
+            '<p>..user_id..</p>'+ 
+            '</div>' + 
+            '<div class="icon">' + 
+            '<i>..arrive_time..</i>' + 
+            '</div>' + 
+            '<a href="#" class="small-box-footer">Confirm <i class="fa fa-arrow-circle-right"></i></a>' + 
+            '</div>' + 
+            '</div>';
+    
+    var re = new RegExp(/\.\.\w*\.\./)
+    var filler = re.exec(box);
+    for (var i=0;i < 3;i++){
+        switch(filler[0]){
+            case '..user_name..':
+                box = box.replace(filler[0], data.name);
+                break;
+            case '..user_id..': 
+                box = box.replace(filler[0], data.u_id);
+                break;
+            case '..arrive_time..':
+                box = box.replace(filler[0], data.time);
+                break;
+        }
+        filler = re.exec(box);
+    }
+    
+    return $(box);
+}
+
+
+function confirm_time(event, confirm_info){
+    var box = $(event.target).parents('.small-box');
+    
+    var confirm_data = {'u_id': box.find('.inner p').text(), 
+                        'method': 'confirm'}
+
+    $.ajax({
+        'url': window.location.origin + '/dashboard/messaging/web',
+        'data': confirm_data,
+        'method': 'POST', 
+        'context': {'box': box, 'to': TO_PRESENT}
+    }).always().done(moveBox).error(confirm_error)
+}
+
+function confirm_error(){
+    // TODO Add pulse animation from red to color
+    var box_footer = $('.small-box-footer', $(this.box));
+    var revertColor = box_footer.css('background');
+    box_footer.css('background', 'red');
+    box_footer.text('Confirm Error ');
+}
+
+function indicate_lunch_start(){
+    
+}
+
+function indicate_lunch_end(){
+    
+}
+
+function decorateBox(box, confirm_info){
+    var replaceables = $('.inner p', box);
+    var confirm_button = $('.small-box-footer i ').click(confirm_time, confirm_info)
+    
+    replaceables.map(function(value, index ,array){
+        $(value).text().replace(/\.\.\w*\.\./, confirm_info[index])
+    })
+    
+    return box 
+}
+
+var TO_PRESENT = 'PRESENT'
+var TO_ARRIVE = 'CHECKIN'
+var TO_LUNCH = 'LUNCH'
+var TO_LEAVE = 'CHECKOUT'
+
+function moveBox(){
+    var totalBox = $(this.box).parent('.col-lg-3.col-xs-6');
+    removeBox(this.box);
+    addBox(totalBox, this.to);
+}
+
+function removeBox(box){
+    // Add animation 
+    
+    var box_parent = $(box).parent()
+    $(box_parent).remove();
+}
+
+function addBox(box, where){
+    var location = new Map([[TO_PRESENT, '.box-success'],
+                        [TO_ARRIVE, '.box-warning'],
+                        [TO_LUNCH, '.box-danger'],
+                        [TO_LEAVE, '.box-primary']])
+    
+    var to = location.get(where);
+    if (to == undefined){
+        console.log('Error adding box');
+    }else{
+        var section = '.box' + location.get(where) + ' .box-body .row';
+        $(box).appendTo(section);
+        $('.small-box-footer').click(confirm_time);
+    }
+}
+

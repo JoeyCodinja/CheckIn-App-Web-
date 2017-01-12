@@ -33,7 +33,7 @@
     <nav class="navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="../../index2.html" class="navbar-brand"><b>MITS</b> Punch In</a>
+          <a href="#" class="navbar-brand"><b>MITS</b> Punch In</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
             <i class="fa fa-bars"></i>
           </button>
@@ -55,28 +55,37 @@
               <!-- Menu Toggle Button -->
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                 <!-- The user image in the navbar-->
-                <img src="../../dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-                <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                <span class="hidden-xs">Alexander Pierce</span>
+                {% if user_name is undefined and user_picture is undefined %}
+                  <!-- TODO: Generic User Image --> 
+                  <img src="../../dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                  <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                  <span class="hidden-xs"> Undefined User </span>
+                {% else %}
+                  <img src="{{ user_picture }}" class="user-image" alt="User Image">
+                  <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                  <span class="hidden-xs">{{ user_name }}</span>
+                {% endif %}
               </a>
               <ul class="dropdown-menu">
                 <!-- The user image in the menu -->
                 <li class="user-header">
-                  <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-
-                  <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2012</small>
-                  </p>
+                  {% if user_name is undefined and user_picture is undefined %}
+                    <!-- TODO: Generic User Image -->
+                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <p> Undefined User</p>
+                  {% else %}
+                    <img src="{{ user_picture }}" class="img-circle" alt="User Image">
+                    <p> {{ user_name }}</p>
+                  {% endif %} 
                 </li>
                 <!-- Menu Body -->
                 
                 <!-- Menu Footer-->
                 <li class="user-footer">
-                  
-                  <div class="pull-right">
+        
+                  <div>
                     <a onclick="signOut()"
-                       class="btn btn-default btn-flat">
+                       class="btn btn-default btn-flat center-block">
                       Sign out
                     </a>
                   </div>

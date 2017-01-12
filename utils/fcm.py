@@ -78,7 +78,14 @@ class FCM_HTTP(object):
                                       json.dumps(data))
                                       
         if response.status_code == 200: 
-            return response.json()['results'][0]['message_id']
+            print response.json()
+            print to
+            try: 
+                return response.json()['results'][0]['message_id']
+            except KeyError:
+                # No 'message_id' key found; possible error
+                return response.json()['results']
+                
         else: 
             return False
         
@@ -109,7 +116,7 @@ class FCM_HTTP(object):
             topic = ['confirm',]
         elif int(user_type) == STAFF: 
             # Register the user for the 'arrive' topic
-            topic = ['arrive', 'unregistered', 'lunch', 'confirm']
+            topic = ['arrive', 'unregistered', 'lunch', 'leave']
         else: 
             raise ValueError("No topics available for subscription for user specified")
         

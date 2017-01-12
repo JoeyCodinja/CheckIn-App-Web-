@@ -37,9 +37,10 @@ class PCLocations():
         
         pprint("PC Locations: " + str(pclocations))
         
+        listing = []
+                
         if pclocations is not None:        
             if key is None:
-                listing = []
                 for location in pclocations:
                     for uuid in pclocations[location]:
                         pprint("location: " + str(location))
@@ -51,8 +52,7 @@ class PCLocations():
                         if uuid == key:
                             return location
         else: 
-            pclocations = []
-            return pclocations
+            return listing
             
                     
                 

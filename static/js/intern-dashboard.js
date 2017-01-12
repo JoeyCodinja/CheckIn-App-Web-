@@ -1,8 +1,9 @@
 $('.checkin-btn:not(.checkin-btn.pressed) svg, .checkout-btn:not(.checkout-btn.pressed) svg').click(depress);
 $('.checkin-btn:not(.checkin-btn.pressed) svg, .checkout-btn:not(.checkout-btn-pressed) svg').click(log_event);
 $('.loglunch-btn').click(log_event);
-$('.loglunch-btn').click
-$('.logendlunch-btn').click(log_event);
+$('.loglunchend-btn').click(log_event);
+
+$('.checkin-btn svg, .pending-btn svg, .checkout-btn svg').addClass('center-block');
 
 var timerID; 
 
@@ -21,9 +22,9 @@ var TO_LUNCH = '<-checkout';
 var FROM_LUNCH = 'checkout->';
 
 var LogMapping = new Map([[CHECKIN, TO_PENDING],
-                      [CHECKOUT, TO_CHECKIN],
-                      [LUNCHIN, TO_LUNCH],
-                      [LUNCHOUT, TO_CHECKOUT]])
+                          [CHECKOUT, TO_CHECKIN],
+                          [LUNCHIN, TO_LUNCH],
+                          [LUNCHOUT, FROM_LUNCH]])
 
 // UI Functions 
     // Button UI changes
@@ -52,6 +53,7 @@ function transitionState(to){
     var checkin_btn = $('.checkin-btn');
     var checkout_btn = $('.checkout-btn');
     var lunch_btn = $('.loglunch-btn');
+    var lunchend_btn = $('.loglunchend-btn');
     switch(to){
         case TO_PENDING:
             // Hide the check-in button and show 
@@ -59,9 +61,22 @@ function transitionState(to){
             pending_btn.removeClass('hidden');
             checkin_btn.addClass('hidden');
             break;
+        case FROM_LUNCH:
+            // Hide the lunch controls and 
+            // show the checkout button
+            checkout_btn.removeClass('hidden');
+            lunch_btn.addClass('hidden');
+            lunchend_btn.addClass('hidden');
+            $('.lunch-timer').addClass('final');
+            setTimeout(function(){
+                $('lunch-timer').removeClass('final')
+                
+            }, 3000);
+            clearInterval(timerID);
         case TO_CHECKOUT:
-            // Hide the pending button and show
-            // the checkout button
+            // Hide the pending button; Show
+            // the checkout button and lunch button
+            lunch_btn.removeClass('hidden');
             checkout_btn.removeClass('hidden');
             pending_btn.addClass('hidden');
             break;
@@ -70,17 +85,18 @@ function transitionState(to){
             // show the checkin button
             checkin_btn.removeClass('hidden');
             checkout_btn.addClass('hidden');
+            lunch_btn.addClass('hidden');
+            lunchend_btn.attr('disabled',false);
+            $('.lunch-timer').addClass('hidden')
             break;
         case TO_LUNCH:
             // Hide the checkout button and 
-            // show the lunch controls 
+            // show the lunch controls and
+            // lunch countdown timer (1 hour)
             checkout_btn.addClass('hidden');
-            lunch_btn.removeClass('hidden');
-            break;
-        case FROM_LUNCH:
-            // Hide the lunch controls and 
-            // show the checkout button
-            checkout_btn.removeClass('hidden');
+            lunchend_btn.removeClass('hidden');
+            initTimer(1000*60*60)
+            $('.lunch-timer').removeClass('hidden');
             break;
         default:
             window.alert('Transition Error');
@@ -104,7 +120,7 @@ function initTimer(duration){
     
     timeAfterDuration.setSeconds(duration[2] + timeAfterDuration.getSeconds());
     
-    timerID = setInterval(timeRemaining, 900, timeAfterDuration)
+    timerID = setInterval(timeRemaining, 900, timeAfterDuration, displayTimer)
 }
 
 function calculateDuration(duration){
@@ -124,7 +140,7 @@ function calculateDuration(duration){
     return [hours, minutes, seconds]
 }
 
-function timeRemaining(endTime){
+function timeRemaining(endTime, displayFunction){
     // At call time will return the 
     // remaining time till endTime
     var duration = calculateDuration(endTime.getTime() - new Date().getTime())
@@ -134,19 +150,29 @@ function timeRemaining(endTime){
         clearInterval(timerID);
     }
     
-    return "".concat(duration[0], ':', duration[1], ':', duration[2])
+    displayFunction("".concat(duration[0], ':', duration[1], ':', duration[2]));
 }
 
+function displayTimer(time){
+    //displays the timer on the UI 
+    $('.lunch-timer h2').text(time);
+}
+
+function error_handle(error){
+    // Alerts to specific error messages
     
+}
+
 // Log Functions 
 function log_event(event){
     
     var eventBtn = $(event.target).parents('[class$=-btn]');
     
     cases = {'checkin-btn'    : CHECKIN,
-             'checkout_btn'   : CHECKOUT,
+             'checkout-btn'   : CHECKOUT,
              'loglunch-btn'   : LUNCHIN,
-             'logendlunch-btn': LUNCHOUT}
+             'loglunchend-btn': LUNCHOUT}
+             
     caseEntries = Object.entries(cases);
     for(var caSe=0; caSe < caseEntries.length; caSe++)
     {
@@ -166,7 +192,16 @@ function log_event(event){
     var eventTransition = transitionState;
                  
     $.post(eventURL, logParams)
-        .always(transitionState(LogMapping.get(eventType)))
-        .done(transitionState(TO_CHECKOUT))
-        .fail(transitionState(TO_CHECKIN));
+        .always(function(){
+            transitionState(LogMapping.get(eventType))
+        })
+        .done(function(){
+            if (eventType == LUNCHIN){
+                // disable the Log lunch button
+                $('.loglunch-btn button').attr('disabled', true);
+            }
+        })
+        .fail(function(){
+            transitionState(TO_CHECKIN)
+        });
 }
