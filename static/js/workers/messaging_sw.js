@@ -8,11 +8,16 @@ firebase.initializeApp({'messagingSenderId': '188380223415'})
 const messaging = firebase.messaging();
 
 payloadDescriptions = new Map([['arrive', 'Check-In Confirmation Requested'],
-                               ['UEN', 'Unregistered Entry'],
+                               ['unregistered', 'Unregistered Entry'],
                                ['lunch', ['Lunch Start', 'Lunch End']],
-                               ['confirm', 'Check-In Confirmed']])
+                               ['confirm', 'Check-In Confirmed'],
+                               ['leave' ,'Intern Checkout']])
 
 var lunchStarted = false; 
+
+
+var domains = ["https://checkin-appuwi-codeinja.c9users.io/dashboard/staff", 
+               "https://checkin-appuwi-codeinja.c9users.io/dashboard/intern"]
 
 
 // Handles messages that may occur
@@ -30,6 +35,9 @@ messaging.setBackgroundMessageHandler(function(payload) {
         icon: '/static/ico/favicon.ico'
     };
     
+    var bCastChannel = new BroadcastChannel('inactive_window_listener')
+    bCastChannel.postMessage(payload);
+    
     return self.registration
         .showNotification(notificationTitle, notificationOptions);
     
@@ -37,6 +45,7 @@ messaging.setBackgroundMessageHandler(function(payload) {
 
 
 function getPayloadType(payload){
+    payload = payload.data;
     var notificationObject = {title: payloadDescriptions.get(payload.method), 
                               body: undefined,
                               actions: undefined
@@ -49,19 +58,19 @@ function getPayloadType(payload){
     var trailing_notif_message;
     var notification_actions; 
     
-    switch(payload['method']){
+    switch(payload.method){
         case 'arrive': 
             trailing_notif_message = payload['uid'] + ""
-            notification_actions = {"view": undefined, "confirm": undefined} 
-            addBox(createBox(payload), TO_ARRIVE);
+            // notification_actions = {"view": undefined, "confirm": undefined} 
+            // addBox(createBox(payload), TO_ARRIVE);
             break; 
         case 'lunch':
             if ( !lunchStarted ){
-                lunchStarted = True;
+                lunchStarted = true;
                 trailing_notif_message = " has gone for lunch.";
             }
             else{
-                lunchStarted = False
+                lunchStarted = false;
                 trailing_notif_message = " has come back from lunch.";
             }
             notification_actions={"view": undefined} 

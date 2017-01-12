@@ -1,7 +1,7 @@
 const messaging = firebase.messaging();
 var isSubscribed = false; 
 payloadDescriptions = new Map([['arrive', 'Check-In Confirmation Requested'],
-                               ['UEN', 'Unregistered Entry'],
+                               ['unregistered', 'Unregistered Entry'],
                                ['lunch', ['Lunch Start', 'Lunch End']],
                                ['confirm', 'Check-In Confirmed'],
                                ['leave', 'Intern Checkout']])
@@ -17,65 +17,61 @@ if ('serviceWorker' in navigator){
         })
 }
 
-// Requests persmission for the browser
-// to receive notifications
-messaging.requestPermission().then(
-    function(){}, 
-    function(err){
-        // Show modal that states that 
-        // the user will be unable to ue the 
-        // application properly without this 
-        // enabled with the option to opt-in
+function findUserMoveBox(id, where, to){
+    LocationMapping = new Map([[TO_PRESENT, '.box-success'],
+                               [TO_ARRIVE, '.box-warning'],
+                               [TO_LUNCH, '.box-danger'],
+                               [TO_LEAVE, '.box-primary']]);
+                               
+    box = $('.box'+LocationMapping.get(where)+' .small-box');
+    for (var i=0; i< box.length; i++){
+        var uid = $('.inner p', box[i]).text();
+        if (uid == id){
+            moveBoxArgs = {'to':to,
+                           'box':box[i]}; 
+            moveBox.call(moveBoxArgs);
+            return true;
+        }
     }
-);
- 
-messaging.onMessage(function(payload){
+    return false;
+}
+
+function processPayload(payload){
     var activeDashboard = whichDashboard(); 
     
     payload = payload.data
+    // Check if this is a MessageEvent
+    if (payload.hasOwnProperty('data')){
+        payload = payload.data
+    }
     
     if (payloadDescriptions.has(payload.method)){
         if (activeDashboard == STAFF_DASHBOARD){
             switch(payload.method){
                 case 'arrive':
-                    addBox(createBox(payload), TO_ARRIVE);
+                    var found = findUserMoveBox(payload.u_id, TO_LEAVE, TO_PRESENT);
+                    if (!found){
+                        addBox(createBox(payload), TO_ARRIVE);
+                    }
                     break;
                 case 'lunch':
                     var found = false;
                     box = $('.box.box-success .small-box');
-                    for(var i=0; i < box.length; i++){
-                        var uid = $('.inner p', box[i]).text();
-                        if (uid == payload.u_id){
-                            found = true;
-                            moveBoxArgs = {'to':TO_LUNCH, 
-                                           'box':box[i]};
-                            moveBox.call(moveBoxArgs)
-                            break;
-                        }
-                    }
-                    if (found == false){
-                        box = $('.box.box-danger .small-box'); 
-                        for (var i=0; i < box.length; i++){
-                            var uid = $('.inner p', box[i]).text();
-                            if (uid == payload.u_id){
-                                moveBoxArgs = {'to':TO_PRESENT,
-                                               'box':box[i]}
-                                moveBox.call(moveBoxArgs);
-                                break;
-                            }
+                    
+                    var found = findUserMoveBox(payload.u_id, TO_PRESENT, TO_LUNCH);
+                    if (!found){
+                        found = findUserMoveBox(payload.u_id, TO_LUNCH, TO_PRESENT)
+                        if (!found){
+                            // box is not where its supposed to be
+                            // fire error
+                            console.log('Unable to find info for ' + payload.u_id);
                         }
                     }
                     break;
                 case 'leave':
-                    box = $('.box.box-success .small-box');
-                    for(var i=0; i < box.length; i++){
-                        var uid = $('.inner p', box[i]).text();
-                        if (uid == payload.u_id){
-                            moveBoxArgs = {'to' : TO_LEAVE, 
-                                           'box': box[i]};
-                            moveBox.call(moveBoxArgs);
-                            break;
-                        }
+                    var found = findUserMoveBox(payload.u_id, TO_PRESENT, TO_LEAVE);
+                    if (found){
+                        console.log('Unable to find info for ' + payload.u_id);
                     }
                     break;
                 default: 
@@ -97,7 +93,25 @@ messaging.onMessage(function(payload){
     } else {
         window.alert('Method unknown')
     }
-})
+}
+
+
+// Requests persmission for the browser
+// to receive notifications
+messaging.requestPermission().then(
+    function(){}, 
+    function(err){
+        // Show modal that states that 
+        // the user will be unable to ue the 
+        // application properly without this 
+        // enabled with the option to opt-in
+    }
+);
+ 
+messaging.onMessage(processPayload);
+
+var bCastChannel = new BroadcastChannel('inactive_window_listener');
+bCastChannel.onmessage = processPayload;
 
 function subscribeToTopics(token){
     var requestParameters = {'fcm_iid': token, 'user': whichDashboard() };
