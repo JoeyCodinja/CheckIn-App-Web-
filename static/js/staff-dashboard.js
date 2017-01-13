@@ -111,9 +111,9 @@ function removeResultFromTable(id, section){
         window.alert("Can't retrieve rows for updated on " + section + "tables");
     
     var rows = $(id_selector);
-    for (var item=0; item<row.length; item++){
+    for (var item=0; item<rows.length; item++){
         if (rows[item].innerText == id)
-            $(emails[item]).parents('tr').remove();
+            $(rows).parents('tr').remove();
     }
 }
 
@@ -191,8 +191,8 @@ function generateResultForTable(data){
 }
 
 function updateTableWithNewResults(data){
-    switch(data){
-        case Object.keys(data).includes('register'):
+    switch(Object.keys(data)[0]){
+        case 'register':
             var section = null
             if (data['register']['userType'] == 99) 
                 section = "UNREGISTERED"
@@ -205,10 +205,10 @@ function updateTableWithNewResults(data){
             
             addResultToTable(data['register'], section);
             break;
-        case Object.keys(data).includes('location_assigned'):
-            addResultToTable(data['location_assigned'], 'PC')
+        case 'location_assigned':
+            addResultToTable(data['location_assigned']['uuid'], 'PC')
             break;
-        case Object.keys(data).includes('delete'):
+        case 'delete':
             var userType = data['delete']['userType']
             var isIntern = userType == 90 
             var isStaff = userType == 10 || userType == 8 
@@ -221,9 +221,9 @@ function updateTableWithNewResults(data){
                 removeResultFromTable(data['delete']['email'], 'UNREGISTERED')
             else
                 window.alert('Incompatible Type Found')
-                
             break;
-        case Object.keys(data).includes('location_unassigned'):
+        case 'location_unassigned':
+            removeResultFromTable(data['location_unassigned']['uuid'], 'PC')
             break; 
         default: 
             break;
