@@ -1,71 +1,20 @@
-{% macro intern_arrived(log) - %}
+{% macro intern_log(log, intern) -%}
 <div class="col-lg-3 col-xs-6">
     <!-- TODO: add own color scheme for these backgrounds -->
     <div class="small-box bg-aqua">
         <div class="inner">
             <!-- name of the person who has arrived --> 
-            <h3 class="intern-name">intern_info.getNam()</h5>
+            <h3 class="intern-name">{{ intern.getName() }}</h5>
             <!-- Location where the person has checked-in from -->
-            <p class="intern-arrive-time">log.logger</p>
+            <p class="intern-arrive-time">{{ log._Log__confirm_data['time'] }}</p>
         </div>
         <div class="icon">
             <!--Arrival Time--> 
-            <i class=""></i>
+            <i>{{ log._Log__log_time }}</i>
         </div>
         <a href="#" class="small-box-footer">
             Confirm <i class="ion ion-checkmark-round"></i>
         </a>
     </div>
 </div>
-{%- endmacro %} 
-
-{% macro intern_at_lunch(intern_info, time) -%}
-<div class="col-lg-3 col-xs-6">
-    <!-- TODO: add own color scheme for these backgrounds -->
-    <div class="small-box">
-        <div class="inner">
-            <!-- name of the person who has arrived --> 
-            <h5 class="intern-name">intern_info.getName()</h5>
-            <!-- Location where the person has checked-in from -->
-            <h4 class="intern-lunch-time">intern_info.getTime('lunch_start')</h4>
-        </div>
-        <div class="icon">
-            <!--Picture from Google profile --> 
-            <i class="fa fa-cutlery" aria-hidden="true"></i>
-        </div>
-        <!-- TODO:  --> 
-        <div class="countdown">
-            
-        </div>
-        <a href="#" class="small-box-footer">
-           <!-- Countdown time placed -->
-        </a>
-    </div>
-</div>
-{%- endmacro %}
-
-
-{% macro intern_checkout(intern_info, time) -%}
-<div class="col-lg-4 col-xs-6">
-    <!-- TODO: add own color scheme for these backgrounds -->
-    <div class="small-box">
-        <div class="inner">
-            <!-- name of the person who has arrived --> 
-            <h5 class="intern-name">intern_info.getName()</h5>
-            <!-- Location where the person has checked-in from -->
-            <h4 class="intern-lunch-time">intern_info.getTime('arrival')</h4>
-        </div>
-        <div class="icon">
-            <!--Picture from Google profile --> 
-            <i class="ion ion-android-person"></i>
-        </div>
-        <!-- TODO:  --> 
-        <div class="countdown">
-            
-        </div>
-        <a href="#" class="small-box-footer">
-            Confirm <i class="ion ion-checkmark-round"></i>
-        </a>
-    </div>
-</div>
-{%- endmacro %}
+{% endmacro %}

@@ -1,5 +1,6 @@
 from flask import Flask, redirect, request, jsonify, make_response
 from flask import render_template
+# from flaskext.mail import Mail
 import os
 import json
 from datetime import datetime
@@ -9,6 +10,7 @@ from models.Staff import Staff
 from models.Unregistered import Unregistered
 from models.PCLocations import PCLocations 
 from models.Log import Log
+from models.Timetable import Timetable
 from requests import HTTPError
 from punchin_utils import Utils
 from utils.fcm import FCM_HTTP, FCM_XMPP
@@ -25,6 +27,7 @@ fcm_http = FCM_HTTP()
 # Contstants
 #   User Types
 INTERN = 90
+SUPERVISOR = 30
 STAFF = 10 
 ADMIN = 40
 UNREGISTERED = 99
@@ -59,13 +62,14 @@ def signin_required(f):
                 database.set_token(request.form['fTokenId'])
                 return f(data, *args, **kwargs)
             else:
-                generate_error_template(ERROR_NO_TOKEN, *args, **kwargs)
+                return generate_error_template(ERROR_NO_TOKEN, *args, **kwargs)
     return is_signed_in
 
 def login_required(f):
     @wraps(f)
     def is_logged_in(*args, **kwargs):
-        if 'userId' in request.cookies :
+        if 'userId' in request.cookies:
+            user_object = validate_token(request.cookies['token'])
             return f(*args, **kwargs)
         else: 
             # Send user to the login page
@@ -117,8 +121,9 @@ def error_response(error_type=None):
         error_message['error'] = 'Undefined Error'
     
     return jsonify(error_message)
-        
 # END
+
+# Static items 
     
 # User Facing Web Routes
 @web_app.route('/')
@@ -213,6 +218,9 @@ def dashboard(data):
 def intern_dashboard():
     intern_uid_name_picture = get_uid_name(request.cookies['token'])
     
+    if 'error' in intern_uid_name_picture: 
+        return login()
+    
     return render_template("intern.html",
                            user_id = {'name': intern_uid_name_picture[1],
                                       'picture': intern_uid_name_picture[2]},
@@ -227,20 +235,28 @@ def staff_dashboard():
     
     staff_uid_name = get_uid_name(request.cookies['token'])
     
-    user_listing['staff'] = Staff.from_db(database)
+    if 'error' in staff_uid_name:
+        return login()
+    
+    user_listing['sta`ff'] = Staff.from_db(database)
     user_listing['intern'] = Intern.from_db(database)
     unregistered_listing =  Unregistered.from_db(database)
     logs = Log.from_db(database, staff_uid_name[0])
     pc_locations = PCLocations.from_db(database)
+    timetable = Timetable.from_db(database)
+    
+    import pdb; pdb.set_trace()
     
     return render_template("staff.html", 
+                           date_today      = datetime.now(),
                            user_id         = {'name':staff_uid_name[1], 
                                               'picture': staff_uid_name[2]},
                            valid_locations = PCLocations.valid_locations,
                            user_listing    = user_listing, 
                            unregistered_listing=unregistered_listing,
                            pc_locations    = pc_locations,
-                           logs            = logs)
+                           logs            = logs,
+                           ttable          = timetable.timetable)
     
 @web_app.route('/dashboard/intern/update')
 def intern_update():
@@ -386,7 +402,27 @@ def cancel_unregistered():
     return jsonify({'delete': {'email': request.form['email'],
                                'userType': UNREGISTERED }
                    })
-
+                   
+@web_app.route('/dashboard/timetable', methods=["POST"])
+@login_required
+def timetable_update():
+    # Whenever we are updating this table
+    args = request.form
+    time = {'start': args['start_time'], 'end': args['end_time']}
+    if args['method'] == u'assign':
+        timetable = Timetable.from_db(database)
+        timetable.assign(args['day'], time, args['u_id']).to_db(database)
+        template = web_app.jinja_env.get_template('timetable.html').module.intern_timetable
+        return template(ttable=timetable.timetable)
+    elif args['method'] == u'unassign':
+        timetable = Timetable.from_db(database)
+        time = {'start': args['blockStart'], 'end': args['blockEnd']}
+        timetable.unassign(args['day'], time, args['u_id'])
+        template = web_app.jinja_env.get_template('timetable.html').module.intern_timetable
+        return template(ttable=timetable)
+        
+    return jsonify({'error': 'Unknown method'})
+    
 @web_app.route('/dashboard/subscribe', methods=["POST"])
 @login_required
 def subscribe():
@@ -543,8 +579,8 @@ def validate_token(g_token):
             .update(email=id_info['email'], 
                     name=id_info['name'], 
                     picture=id_info['picture'])
-    except (TypeError, IndexError):
-        raise ValueError('Token passed is invalid')
+    except (TypeError, KeyError):
+        raise ValueError('Token passed is invalid', return_data)
         
     return return_data
     
@@ -592,7 +628,12 @@ def is_preregistered(email):
         return False
     
 def get_uid_name(token):
-    user = validate_token(token)['googleUserObject']
+    try:
+        user = validate_token(token)['googleUserObject']
+    except ValueError as e:
+        for i in e.args:
+            if 'error' in i: 
+                return i
     picture = user['picture']
     user = user['email']
     user = user.split('@')[0]
@@ -674,8 +715,21 @@ def parse_email_id(escaped_email):
     
     return escaped_email
     
+def email_confirmation(time, mits_intern): 
+    # This function is executed 30 minutes 
+    # after the invocation of the request 
+    # for confirmation message being sent 
+    # from the intern
+    template = "{} submitted a confirmation request" +\
+               "at {} but was unconfirmed for 30 "   +\
+               "minutes. This email serves as "      +\
+               "confirmation that {} did check-in"   +\
+               " at the time mentioned above"
+    relevant_recipients = [] 
 
 if __name__ == "__main__":
+    from jinja2.environment import Environment
     web_app.config.debug = True
-    
+    web_app.jinja_env.add_extension('jinja2.ext.do')
     web_app.run(os.getenv('IP', '0.0.0.0'), os.getenv('PORT', 8080))
+    

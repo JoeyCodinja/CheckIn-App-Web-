@@ -1,3 +1,17 @@
+@font-face{
+    font-family: 'Led-Display';
+    src: url('../fonts/led_display-7.ttf')
+}
+
+/* Timetable section */ 
+.content .content:nth-of-type(12) td{
+     text-align:center;
+}
+
+.time-display{
+    font-family:'Led-Display';
+}
+
 .small-box .icon {
     color: white;
     font-style:normal;
@@ -7,4 +21,28 @@
 
 .small-box .icon:hover{
     font-size: 25px;
+}
+
+.fa-plus-square:not(:hover){
+    animation-name: shrink;
+    animation-duration: .25s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
+}
+
+.fa-plus-square:hover{
+    animation-name: grow;
+    animation-duration: .25s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
+}
+
+@keyframes grow{
+    from {transform: scale(1,1);}
+    to   {transform: scale(2,2);}
+}
+
+@keyframes shrink{
+    from {transform: scale(2,2);}
+    to   {transform: scale(1,1);}
 }

@@ -276,6 +276,13 @@ desired effect
             <li><a href="#">Unregistered</a></li>
           </ul>
         </li>
+        <li>
+          <a href="#">
+            <i class="fa fa-table"></i> 
+            <span>Intern Timetable</span>
+          </a>
+          
+        </li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -304,12 +311,14 @@ desired effect
       {% import 'main_staff_dashboard.html' as dash_body %}
       {% import 'manage_users.html' as user_manage %}
       {% import 'pc_locate.html' as locate_pc %} 
+      {% import 'timetable.html' as timetable %}
     
-      {{ dash_body.main_dashboard() }} 
+      {{ dash_body.main_dashboard(logs, user_listing['intern'], date_today) }} 
       {{ user_manage.manage_users(90, user_listing['intern']) }}
       {{ user_manage.manage_users(10, user_listing['staff']) }}
       {{ user_manage.manage_users(user_listing=unregistered_listing) }}
       {{ locate_pc.locate_pc(pc_locations) }}
+      {{ timetable.intern_timetable(ttable) }} 
       
     </section>
     <!-- /.content -->
@@ -461,12 +470,7 @@ desired effect
      fixed layout. -->
 {% import 'manage_users.html' as user_manage %}
 {% import 'pc_locate.html' as locate_pc %} 
-      
-    {{ user_manage.add_user(True) }}
-    {{ user_manage.delete_user() }}
-    {{ user_manage.add_user() }}
-    {{ locate_pc.assign_location(valid_locations) }}
-    {{ locate_pc.unassign_location() }} 
+{{ timetable.assign_time_intern(ttable['Monday'].keys(), user_listing['intern']) }} 
     
 </body>
 </html>

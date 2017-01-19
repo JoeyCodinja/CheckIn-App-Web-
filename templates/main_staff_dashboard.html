@@ -1,15 +1,32 @@
-{% macro main_dashboard() -%}
+{% macro main_dashboard(logs, intern_list, date_today) -%}
 <!-- 
      Both sections start off hidden so as not to 
      interrupt the main dashboard
 --> 
+{% from 'intern_states.html' import intern_log %} 
 <section class="content-header">
-    <h1 class="time-display" style="text-align: center;
-                                    font-size: xxx-large">
+    <h1 class="time-display text-center" style="font-size: xxx-large">
         <!-- Display the current time --> 
     </h1>
 </section>
 <section class="content">
+    <div class="box box-grey">
+        <div class="box-header with-border">
+            <h3 class="box-title">Absent</h3>
+            <div class="box-tools pull-right">
+                <button type="button"
+                        class="btn btn-box-tool"
+                        data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                
+            </div>
+        </div>
+    </div>
     <div class="box box-success">
         <!-- Showing arrival of interns --> 
         <div class="box-header with-border">
@@ -18,13 +35,22 @@
                 <button type="button" 
                         class="btn btn-box-tool" 
                         data-widget="collapse">
-                    <i class="fa fa-minus"></i></i>
+                    <i class="fa fa-minus"></i>
                 </button>
             </div>
         </div>
         <div class="box-body">
             <div class="row">
-                {% for log in logs%}
+                {% for log in logs %}
+                    {% if log.is_confirmed or log.lunch_data['start'] == 'null' %}
+                        {% for intern in intern_list %}
+                            {% if intern.getPassId() == log.logger %}
+                                {% if date_today.date() == log._Log__log_time.date() %}
+                                    {{ intern_log(log, intern) }} 
+                                {% endif %} 
+                            {% endif %} 
+                        {% endfor %}
+                    {% endif %} 
                 {% endfor %} 
             </div>
         </div>
@@ -44,6 +70,15 @@
         <div class="box-body">
             <div class="row">
                 {% for log in logs%}
+                    {% if not log.is_confirmed %}
+                        {% for intern in intern_list %}
+                            {% if intern.getPassId() == log.logger %}
+                                {% if date_today.date() == log._Log__log_time.date() %}
+                                    {{ intern_log(log, intern) }} 
+                                {% endif %} 
+                            {% endif %} 
+                        {% endfor %} 
+                    {% endif %} 
                 {% endfor %} 
             </div>
         </div>
@@ -63,6 +98,13 @@
         <div class="box-body">
             <div class="row">
                 {% for log in logs%}
+                    {% for intern in intern_list %}
+                            {% if intern.getPassId() == log.logger %}
+                                {% if date_today.date() == log._Log__log_time.date() %}
+                                    {{ intern_log(log, intern) }} 
+                                {% endif %} 
+                            {% endif %} 
+                        {% endfor %}
                 {% endfor %} 
             </div>
         </div>
@@ -82,6 +124,15 @@
         <div class="box-body">
             <div class="row">
                 {% for log in logs%}
+                    {% if log.is_confirmed and log.__leave != 'null' %} 
+                        {% for intern in intern_list %}
+                            {% if intern.getPassId() == log.logger %}
+                                {% if date_today.date() == log._Log__log_time.date() %}
+                                    {{ intern_log(log, intern) }} 
+                                {% endif %} 
+                            {% endif %} 
+                        {% endfor %}
+                    {% endif%} 
                 {% endfor %} 
             </div>
         </div>

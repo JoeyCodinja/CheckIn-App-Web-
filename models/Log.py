@@ -21,7 +21,7 @@ class Log:
         if when is not None:
             self.__log_time = when
         else: 
-            self.__log_time = datetime.now().time().isoformat()[:8]
+            self.__log_time = datetime.now()
         
         if lunch_data is not None: 
             self.__lunch_time = lunch_data
@@ -131,12 +131,12 @@ class Log:
             else: 
                 return ValueError('Incorrect date format passed')
         
-        
         def construct_instance(key, data):
             instance_args = {'lid'  : key,
                              'ltype': data['type'],
                              'who'  : data['from'],
-                             'when' : data['arrive-time']}
+                             'when' : transform_datetime(data['date'],
+                                                         data['arrive-time'])}
             date = data['date'] 
             try:
                 have_confirmant = data['confirmed']['who'] is not None 
