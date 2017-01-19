@@ -1,4 +1,4 @@
-{% macro main_dashboard(logs, intern_list, date_today) -%}
+{% macro main_dashboard(logs, intern_list, date_today, absentees) -%}
 <!-- 
      Both sections start off hidden so as not to 
      interrupt the main dashboard
@@ -23,7 +23,11 @@
         </div>
         <div class="box-body">
             <div class="row">
-                
+                {% for user in intern_list %}
+                    {% if user.getPassId() in absentees %}
+                        {{ intern_log(user, none) }} 
+                    {% endif %} 
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -46,7 +50,7 @@
                         {% for intern in intern_list %}
                             {% if intern.getPassId() == log.logger %}
                                 {% if date_today.date() == log._Log__log_time.date() %}
-                                    {{ intern_log(log, intern) }} 
+                                    {{ intern_log(intern, log) }} 
                                 {% endif %} 
                             {% endif %} 
                         {% endfor %}
@@ -74,7 +78,7 @@
                         {% for intern in intern_list %}
                             {% if intern.getPassId() == log.logger %}
                                 {% if date_today.date() == log._Log__log_time.date() %}
-                                    {{ intern_log(log, intern) }} 
+                                    {{ intern_log(intern, log) }} 
                                 {% endif %} 
                             {% endif %} 
                         {% endfor %} 
@@ -101,7 +105,7 @@
                     {% for intern in intern_list %}
                             {% if intern.getPassId() == log.logger %}
                                 {% if date_today.date() == log._Log__log_time.date() %}
-                                    {{ intern_log(log, intern) }} 
+                                    {{ intern_log(intern, log) }} 
                                 {% endif %} 
                             {% endif %} 
                         {% endfor %}
@@ -128,7 +132,7 @@
                         {% for intern in intern_list %}
                             {% if intern.getPassId() == log.logger %}
                                 {% if date_today.date() == log._Log__log_time.date() %}
-                                    {{ intern_log(log, intern) }} 
+                                    {{ intern_log(intern, log) }} 
                                 {% endif %} 
                             {% endif %} 
                         {% endfor %}

@@ -313,7 +313,7 @@ desired effect
       {% import 'pc_locate.html' as locate_pc %} 
       {% import 'timetable.html' as timetable %}
     
-      {{ dash_body.main_dashboard(logs, user_listing['intern'], date_today) }} 
+      {{ dash_body.main_dashboard(logs, user_listing['intern'], date_today, absentees) }} 
       {{ user_manage.manage_users(90, user_listing['intern']) }}
       {{ user_manage.manage_users(10, user_listing['staff']) }}
       {{ user_manage.manage_users(user_listing=unregistered_listing) }}

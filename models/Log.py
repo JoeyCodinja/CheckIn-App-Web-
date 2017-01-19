@@ -107,6 +107,16 @@ class Log:
             
     def depart(self):
         self.__leave = datetime.now().time().isoformat()[:8]
+        
+    @staticmethod
+    def get_absent_interns(database, intern_list, u_id):
+        logs = Log.from_db(database, u_id)
+        for log in logs:
+            if log.logger in intern_list and datetime.now().date() == log._Log__log_time.date(): 
+                intern_list.remove(log.logger)
+        
+        return intern_list
+                
     
     @staticmethod
     def from_db(database, u_id, key=None):

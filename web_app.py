@@ -242,6 +242,9 @@ def staff_dashboard():
     user_listing['intern'] = Intern.from_db(database)
     unregistered_listing =  Unregistered.from_db(database)
     logs = Log.from_db(database, staff_uid_name[0])
+    absent = Log.get_absent_interns(database, 
+                                    [user.getPassId() for user in user_listing['intern']],
+                                    staff_uid_name[0])
     pc_locations = PCLocations.from_db(database)
     timetable = Timetable.from_db(database)
     
@@ -253,6 +256,7 @@ def staff_dashboard():
                                               'picture': staff_uid_name[2]},
                            valid_locations = PCLocations.valid_locations,
                            user_listing    = user_listing, 
+                           absentees       = absent,
                            unregistered_listing=unregistered_listing,
                            pc_locations    = pc_locations,
                            logs            = logs,
