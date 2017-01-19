@@ -39,14 +39,16 @@
                                 Assign to Location
                             </button>
                         </td>
-                        {% if pc.get_assigned_loc() != pc.Unregistered %}
                         <td>
                             <button type="button" class="btn btn-danger"
                                     data-toggle="modal" data-target="#unassign_location">
-                                Unassign From Location
+                                {% if pc.get_assigned_loc() != pc.Unregistered %}
+                                    Unassign From Location
+                                {% else %} 
+                                    Remove
+                                {% endif %}
                             </button>
                         </td>
-                        {% endif %}
                     </tr>
                     {% endfor %}
                     

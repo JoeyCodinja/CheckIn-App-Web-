@@ -9,8 +9,8 @@ class Database(object):
         self.auth = self.firebase_conn.auth()
         self.token = token
     
-    def query(self, location, key=None, token=None):
-        print "Location: "+ str(location)
+    def query(self, location, key=None ,token=None):
+        print "Location: "+ str(location) + "\tKey: " + str(key)
         location = self.path_parse(location)
         if len(location) == 1: 
             ultimate_node = self.database.child(location[0])
@@ -43,7 +43,7 @@ class Database(object):
             print ultimate_node.child(name).update(data, token)
         except HTTPError as e:
             print "Firebase POST: " + e.strerror + '\nLocation:'+ str(location) + '\nData: ' + str(data)
-            return False
+            return json.loads(e.strerror)
         return True
         
     def insert(self, location, data, token=None):
@@ -72,7 +72,8 @@ class Database(object):
                 token = self.token
             ultimate_node.child(key).remove(token)
         except HTTPError as e: 
-            return False
+            print "Firebase DELETE: " + e.strerror 
+            return json.loads(e.strerror)
         return True
         
     def path_parse(self, location):

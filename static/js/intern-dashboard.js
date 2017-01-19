@@ -86,7 +86,6 @@ function transitionState(to){
             checkin_btn.removeClass('hidden');
             checkout_btn.addClass('hidden');
             lunch_btn.addClass('hidden');
-            lunchend_btn.attr('disabled',false);
             $('.lunch-timer').addClass('hidden')
             break;
         case TO_LUNCH:
@@ -95,6 +94,7 @@ function transitionState(to){
             // lunch countdown timer (1 hour)
             checkout_btn.addClass('hidden');
             lunchend_btn.removeClass('hidden');
+            lunch_btn.attr('disabled',false);
             initTimer(1000*60*60)
             $('.lunch-timer').removeClass('hidden');
             break;

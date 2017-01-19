@@ -7,6 +7,8 @@ $(document).ready(function(){
     
     $('#assign_location .modal-footer .btn-success').click(formTransmitData);
     
+    $('#time_table .modal-footer .btn-success').click(validate_inputs);
+    
     $('.register_cancel').click(formTransmitData);
 });
 
@@ -28,10 +30,9 @@ function startDisplayTimer(){
 
 startDisplayTimer();
 
-
 // User Submitted Data Functions
 
-function formTransmitData(){
+function formTransmitData(event){
     if ($(this).parents('.modal').length == 0)
         var modalSelector = '#cancel_unregistered'
     else
@@ -39,6 +40,7 @@ function formTransmitData(){
     
     var data; 
     var action; 
+    var doneFnc = updateTableWithNewResults;
     
     switch(modalSelector){
         case '#delete-user':
@@ -70,8 +72,14 @@ function formTransmitData(){
     
     console.log("Data being sent" + data);
     
+    if (event.data != null){
+        if (event.data.hasOwnProperty('done')){
+            console.log(event.data);
+            doneFnc = event.data;   
+        }
+    } 
     $.post(action, data, null, 'json')
-        .done(updateTableWithNewResults)
+        .done(doneFnc)
         .fail(errorOccurred)
         .always(removeModal);
 }
@@ -268,7 +276,6 @@ function createBox(data){
     return $(box);
 }
 
-
 function confirm_time(event, confirm_info){
     var box = $(event.target).parents('.small-box');
     
@@ -344,3 +351,95 @@ function addBox(box, where){
     }
 }
 
+// Timetable functions
+function populateTimeTable(data){
+    $('.content > .content:not(.content.hidden),' +  
+      '.content > .content-header:not(.content-header.hidden)').remove();
+    $('.content-wrapper > .content:first-of-type').append(data);
+}
+
+// Error Types
+const DATA_INVALID = 'invalid';
+const TIME_INVALID = 'wrong_time';
+const NO_INTERN = 'no_intern';
+
+function validate_inputs(event){
+    // For use with modals
+    var modal = $(event.target).parents('.modal');
+    var id = modal.attr('id');
+    switch(id){
+        case "time_table":
+            var form_args = modal.find('form').serializeArray();
+            
+            form_args = form_args.reduce(function(cumulative, value){
+                if (cumulative == undefined || cumulative === null){
+                    cumulative = new Object(); 
+                }
+                
+                Object.defineProperty(cumulative, 
+                                      value.name, 
+                                      {'value': value.value})
+                return cumulative
+                
+            });
+            // ensure that the times that are being sent are logical
+            var startHour = Number(form_args['start_time'].slice(0,2));
+            var endHour = Number(form_args['end_time'].slice(0,2));
+            
+            var intern = form_args['u_id']
+            
+            var errorArgs = {'modal': modal,'errorType': null}; 
+            
+            if ( !( endHour > startHour)){
+                errorArgs['errorType'] = TIME_INVALID;
+                modalError.call(errorArgs);
+            }
+            else if (!intern.match(/\d{5}p/g)){
+                errorArgs['errorType'] = NO_INTERN;
+                modalError.call(errorArgs);
+            }
+            else{
+                formTransmitData.call(event.target, {'data': {'done': populateTimeTable}});
+            }
+            break; 
+        default: 
+            
+    }
+}
+
+function modalError(){
+    btn = this.modal.find('.modal-footer .btn-success')
+    btn.attr('data-toggle', 'popover');
+    btn.attr('data-container', 'body');
+    btn.attr('placement', 'right');
+    switch(this.errorType){
+        case TIME_INVALID:
+            this.modal
+                .find('#blockEnd')
+                .parents('.form-group')
+                .addClass('has-error');
+            btn.attr('data-content', 'Invalid start/end times');
+            break;
+        case NO_INTERN:
+            this.modal
+                .find('#blockStart')
+                .parents('.form-group')
+                .addClass('has-error');
+            btn.attr('data-content', 'No Intern selected');
+            break;
+        default: 
+            btn.attr('data-content', 'Error occured');
+            break;
+    }
+    btn.popover('show');
+    // Once the modal is clicked ... 
+    // we can remove any remenant of the error
+    this.modal.one('click', resetModal)
+}
+
+function resetModal(event){
+    // Method is bound for one use
+    var modal = $(event.delegateTarget);
+    $(modal.find('.has-error')).removeClass('.has-error');
+    modal.find('.modal-footer .btn-success').popover('hide');
+}

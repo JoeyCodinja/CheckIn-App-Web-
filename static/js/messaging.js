@@ -49,7 +49,7 @@ function processPayload(payload){
         if (activeDashboard == STAFF_DASHBOARD){
             switch(payload.method){
                 case 'arrive':
-                    var found = findUserMoveBox(payload.u_id, TO_LEAVE, TO_PRESENT);
+                    var found = findUserMoveBox(payload.u_id, TO_LEAVE, TO_ARRIVE);
                     if (!found){
                         addBox(createBox(payload), TO_ARRIVE);
                     }

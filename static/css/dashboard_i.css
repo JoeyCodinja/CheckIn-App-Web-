@@ -1,11 +1,15 @@
 @font-face{
     font-family:'Eras Demi ITC';
-    src: url('static/fonts/ERASDEMI.TTF')
+    src: url('../fonts/ERASDEMI.TTF')
 }
 
 .pressed{ 
     display:none;
 } 
+
+.loglunch-btn{
+    
+}
 
 .loglunchend-btn .icon.ion-pizza{
     color: yellow;
@@ -15,7 +19,6 @@
     animation-name:twoblink;
     animation-duration:2s;
     animation-iteration-count:2;
-    
 }
 
 @keyframes twoblink{
