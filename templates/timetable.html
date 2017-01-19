@@ -1,0 +1,103 @@
+{% macro intern_timetable(ttable) -%}
+{% set days = ttable.keys() %} 
+{% set times = ttable[days[0]].keys() %}
+<section class="content-header hidden">
+    
+</section>
+<section class="content hidden">
+    <div class="table-responsive">
+        <table class="table"> 
+            <thead>
+                <th> </th>
+                {% for day in days %}
+                    <th> {{ day }} </th>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for time in times %}
+                <tr>
+                    <td> {{ time }} </td>
+                    {% for day in ttable %}
+                        <td>
+                            {% if ttable[day][time]|length == 1 and ttable[day][time][0] == 'null' %}
+                                {# This is a ttable slot that isn't filled #} 
+                                <i class="fa fa-plus-square fa-fw" 
+                                   data-grid="{{ times.index(time), days.index(day) }}"
+                                   data-toggle="modal"
+                                   data-target="#time_table"></i>
+                            {% else %} 
+                                {# This ttable slot is filled #}
+                                {{ ttable[day][time]|join(',')}}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{%- endmacro %}
+
+{% macro assign_time_intern(avail_times, user_listing) %}
+<div class="modal fade" id="time_table" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" 
+                data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Intern Timetable Edit</h4>
+      </div>
+      <div class="modal-body">
+          <form action="https://checkin-appuwi-codeinja.c9users.io/dashboard/timetable">
+              <input type="hidden" id="method-input" name="method" value="assign">
+              <div class="form-group">
+                  <label for="internID"></label>
+                  <select class="form-control" id="blockStart" name="u_id">
+                      <option value="" selected>Select Intern</option>
+                      {% for user in user_listing %}
+                          <option value="{{ user.getPassId() }}"> 
+                              {{ user.getName() }} 
+                          </option>
+                      {% endfor %} 
+                  </select>
+              </div>
+              <div class="form-group">
+                  {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %} 
+                      <div class="radio">
+                          <label>
+                              <input type="radio" id="workDay{{loop.index}}" name="day" value="{{ day }}">
+                              {{ day }}
+                          </label>
+                      </div>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  <label for="blockStart">From:</label>
+                  <select class="form-control" id="blockStart" name="start_time">
+                      {% for time in avail_times %}
+                          <option value="{{ time }}">{{ time }}</option>
+                      {% endfor %}
+                  </select> 
+              </div>
+              <div class="form-group">
+                  <label for="blockEnd">To:</label>
+                  <select class="form-control" id="blockEnd" name="end_time">
+                      {% for time in avail_times %}
+                          <option value="{{ time }}">{{ time }}</option>
+                      {% endfor %} 
+                  </select>
+              </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+         
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" >Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
