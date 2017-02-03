@@ -54,11 +54,13 @@ function switchContentView(contentView){
             antiContentIndicies = [0, 1, 2, 3, 4, 5, 6, 7, 10, 11];
             showContentView(contentIndicies);
             hideContentView(antiContentIndicies);
+            break;
         case "Intern Timetable":
             contentIndicies = [10, 11];
             antiContentIndicies = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             showContentView(contentIndicies);
             hideContentView(antiContentIndicies);
+            break;
         default:
             break;
     }
@@ -162,7 +164,7 @@ $('.btn[data-target*=assign_location]').click(function(){
 })
 
 $('i[data-target*=time_table]').click(function(){
-    var dayAndTime = getDayAndTime($(this))
+    var dayAndTime = getDayAndTime($(this));
     
     $('#time_table input[name=day]').each(function(){
         if ($(this).val() == dayAndTime.day){
@@ -179,3 +181,81 @@ $('i[data-target*=time_table]').click(function(){
         });
     
 })
+
+$('.fa-ban[data-target*=time_table]').click(function(){
+    // Canceling/Editing the previous times set
+    var modal = $('#time_table');
+    activateEditMode(modal);
+    
+    var id = $('+ .intern-work-slot', this).text().replace(',', '').trim();
+    
+    
+    var gridRef = $(this).attr('data-grid');
+    var extractRef = RegExp(/(\d),\W*(\d)/g);
+    var result = extractRef.exec(gridRef);
+    var returnArray = [];
+    result = result.slice(1).map(function(value){
+        return Number(value);
+    });
+    
+    console.log(result);
+    console.log(id);
+    var range = getTimeSpan(result, id);
+    
+    var range_start = $(range[0]).parent().find('td:first-of-type').text().trim();
+    var range_end = $(range[range.length-1]).parent().find('td:first-of-type').text().trim();
+    day = $('.content .content:nth-of-type(12) thead tr th:nth-of-type('+ (result[1] + 2) +')')
+            .text()
+            .trim();
+    
+    modal.find('#userId').val(id);
+    modal.find('#blockStart').val(range_start);
+    modal.find('#blockEnd').val(range_end);
+    modal.find('input[name=day]').val(day);
+})
+
+
+var editMode = false;
+var old_values = {};
+
+function activateEditMode(modal){
+    $(modal.find('.modal-title')).text('Intern Timetable Edit');
+    $(modal.find('.modal-footer .btn-danger')).removeClass('hidden');
+    
+    header = $('.modal-header', modal);
+    
+    old_values = {
+        'background-color': header.css('background-color'), 
+        'border-bottom-color': header.css('border-bottom-color'),
+        'border-bottom-width': header.css('border-bottom-width'),
+    } 
+
+    header.css('background-color', '#e53f3f');
+    header.css('border-bottom-color', '#ffa097');
+    header.css('border-bottom-width', '3px');
+    
+    
+    editMode = true;
+}
+
+// Timetable animations
+$('.intern-work-slot').hover(function(event){
+    intern_text = $(this)
+    cancel_btn = $($(this).parent()).find('.fa-ban');
+    cancel_btn.addClass('active');
+    cancel_btn.css('display', 'inline-block');
+    intern_text.css('display', 'none');
+}); 
+
+
+$('.fa.fa-ban').hover(function(){}, 
+function(event){
+    cancel_btn = $(this);
+    intern_text = $($(this).parent()).find('.intern-work-slot');
+    cancel_btn.removeClass('active');
+    cancel_btn.css('display', 'none');
+    intern_text.css('display', 'inline-block');
+})
+
+
+

@@ -109,15 +109,22 @@ class Log:
         self.__leave = datetime.now().time().isoformat()[:8]
         
     @staticmethod
-    def get_absent_interns(database, intern_list, u_id):
+    def get_absent_interns(database, intern_list, timetable, u_id):
         logs = Log.from_db(database, u_id)
+        today = datetime.now().date()
+        from pprint import pprint
         for log in logs:
-            if log.logger in intern_list and datetime.now().date() == log._Log__log_time.date(): 
-                intern_list.remove(log.logger)
-        
+            intern_in_list = log.logger in intern_list
+            todays_log = today == log._Log__log_time.date()
+            timetabled_today = [log.logger in timetable[today.strftime('%A')][times] for times in timetable[today.strftime('%A')]]
+            timetabled_today = reduce(lambda x, y: x | y, timetabled_today)
+            if intern_in_list:
+                if todays_log or not timetabled_today:
+                    intern_list.remove(log.logger)
+            else: 
+                continue
         return intern_list
                 
-    
     @staticmethod
     def from_db(database, u_id, key=None):
         def key_is_id(key):
@@ -217,11 +224,12 @@ class Log:
                 'date': datetime.now().date().isoformat(),
                 'where': self.__location,
                 'leave_time': self.__leave, 
-                'arrive-time': self.__log_time,
+                'arrive-time': self.__log_time.time().isoformat()[:8] if isinstance(self.__log_time, datetime) else self.__log_time,
                 'lunch-time': lunch_time,
                 'confirmed': self.__confirm_data
                }
-                
+        from pprint import pprint
+        pprint(data)
         database.put('/log', self.__lid, data)
     
     @staticmethod 
@@ -238,7 +246,6 @@ class Log:
             if is_staff or is_staffadmin or is_admin:
                 staff_members.append(users[user]['id'])
         return staff_members
-        
         
     # TODO: write Logs to file
     def to_file(self, database):

@@ -27,7 +27,17 @@
                                    data-target="#time_table"></i>
                             {% else %} 
                                 {# This ttable slot is filled #}
-                                {{ ttable[day][time]|join(',')}}
+                                {% for id in ttable[day][time] %}
+                                    <i class="fa fa-ban" 
+                                       data-grid="{{ times.index(time), days.index(day) }}"
+                                       data-toggle="modal"
+                                       data-target="#time_table"></i>
+                                    <p class="intern-work-slot">{{ id + ', '}}</p>
+                                {% endfor %}
+                                <i class="fa fa-plus-square fa-fw" 
+                                   data-grid="{{ times.index(time), days.index(day) }}"
+                                   data-toggle="modal"
+                                   data-target="#time_table"></i>
                             {% endif %}
                         </td>
                     {% endfor %}
@@ -48,14 +58,14 @@
                 data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title" id="myModalLabel">Intern Timetable Edit</h4>
+        <h4 class="modal-title" id="myModalLabel">Intern Timetable Add</h4>
       </div>
       <div class="modal-body">
           <form action="https://checkin-appuwi-codeinja.c9users.io/dashboard/timetable">
               <input type="hidden" id="method-input" name="method" value="assign">
               <div class="form-group">
                   <label for="internID"></label>
-                  <select class="form-control" id="blockStart" name="u_id">
+                  <select class="form-control" id="userId" name="u_id">
                       <option value="" selected>Select Intern</option>
                       {% for user in user_listing %}
                           <option value="{{ user.getPassId() }}"> 
@@ -96,6 +106,7 @@
          
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-success" >Update</button>
+        <button type="button" class="btn btn-danger hidden"> Delete </button>
       </div>
     </div>
   </div>

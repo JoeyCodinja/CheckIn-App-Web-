@@ -50,12 +50,14 @@ class Timetable:
                 if time == time_info['start']:
                     if 'null' in self.timetable[day][time] :
                         self.timetable[day][time].remove('null')
-                    self.timetable[day][time].append(uid)
+                    if uid not in self.timetable[day][time]:
+                        self.timetable[day][time].append(uid)
                     range_start = True
                 elif range_start:
                     if 'null' in self.timetable[day][time]:
                         self.timetable[day][time].remove('null')
-                    self.timetable[day][time].append(uid)
+                    if uid not in self.timetable[day][time]:
+                        self.timetable[day][time].append(uid)
                     
                 if time == time_info['end']:
                     range_start = False
@@ -64,11 +66,21 @@ class Timetable:
             raise ValueError('Argument \'day\' is invalid')
             
     def unassign(self, day, time, uid):
-        if uid in self.timetable[day][time]:
-            pass
-        else:
-            raise ValueError()
-    
+        correct_format = isinstance(time, dict) and 'start' in time and 'end' in time
+        range_start = False
+        if not correct_format:
+            raise ValueError('time argument passed is malformed')
+        
+        for times in self.timetable[day]:
+            if times == time['start']: 
+                range_start= True
+            if range_start: 
+                if uid in self.timetable[day][times] and len(self.timetable[day][times]) == 1:
+                    self.timetable[day][times].append('null')
+                self.timetable[day][times].remove(uid)
+            if times == time['end']:
+                return self
+        
     def list_interns(self, day, time=None):
         def remove_duplicates(array):
             for item in array:

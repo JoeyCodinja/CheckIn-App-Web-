@@ -21,12 +21,21 @@ function findUserMoveBox(id, where, to){
     LocationMapping = new Map([[TO_PRESENT, '.box-success'],
                                [TO_ARRIVE, '.box-warning'],
                                [TO_LUNCH, '.box-danger'],
-                               [TO_LEAVE, '.box-primary']]);
+                               [TO_LEAVE, '.box-primary'],
+                               [TO_ABSENT, '.box-grey']]);
                                
     box = $('.box'+LocationMapping.get(where)+' .small-box');
     for (var i=0; i< box.length; i++){
-        var uid = $('.inner p', box[i]).text();
+        var uid = $('.inner p', box[i]).text().trim();
         if (uid == id){
+            if (to != TO_ARRIVE){
+                $('.small-box-footer', box[i]).text('')
+                $('.small-box-footer i').css('display', 'none');
+            }
+            else{
+                $('.small-box-footer', box[i]).text('Confirm');
+                $('.small-box-footer i').css('display', 'inline-block');
+            }
             moveBoxArgs = {'to':to,
                            'box':box[i]}; 
             moveBox.call(moveBoxArgs);
@@ -51,13 +60,13 @@ function processPayload(payload){
                 case 'arrive':
                     var found = findUserMoveBox(payload.u_id, TO_LEAVE, TO_ARRIVE);
                     if (!found){
-                        addBox(createBox(payload), TO_ARRIVE);
+                        found = findUserMoveBox(payload.u_id, TO_ABSENT, TO_ARRIVE);
+                        if(!found){
+                            addBox(createBox(payload), TO_ARRIVE);
+                        }
                     }
                     break;
                 case 'lunch':
-                    var found = false;
-                    box = $('.box.box-success .small-box');
-                    
                     var found = findUserMoveBox(payload.u_id, TO_PRESENT, TO_LUNCH);
                     if (!found){
                         found = findUserMoveBox(payload.u_id, TO_LUNCH, TO_PRESENT)

@@ -6,19 +6,13 @@
             <!-- name of the person who has arrived --> 
             <h3 class="intern-name">{{ intern.getName() }}</h5>
             <!-- Location where the person has checked-in from -->
-            <p class="intern-arrive-time"> 
-            {% if log is not none %} 
-                {{ log._Log__confirm_data['time']|default('Not Present') }}
-            {% endif %}
+            <p class="intern-id">
+                {{ intern.getPassId() }} 
             </p>
         </div>
         <div class="icon">
             <!--Arrival Time--> 
-            <i>
-                {% if log is not none %} 
-                    {{ log._Log__log_time|default('') }}
-                {% endif %} 
-            </i>
+            <i class="fa fa-info-circle"></i>
         </div>
         <a href="#" class="small-box-footer">
             Confirm <i class="ion ion-checkmark-round"></i>

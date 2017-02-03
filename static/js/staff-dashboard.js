@@ -9,8 +9,16 @@ $(document).ready(function(){
     
     $('#time_table .modal-footer .btn-success').click(validate_inputs);
     
+    $('#time_table .modal-footer .btn-danger').click(transform_form);
+    
     $('.register_cancel').click(formTransmitData);
+    
+    $('#time_table').on('hidden.bs.modal', function(event){
+        resetModal(event);
+        revertEditMode(this);
+    })
 });
+
 
 // Time Management functions
 var timerIntervalId = null; 
@@ -202,6 +210,10 @@ function updateTableWithNewResults(data){
     switch(Object.keys(data)[0]){
         case 'register':
             var section = null
+            var userType= data['register']['userType']
+            var isIntern =  userType == 90;
+            var isStaff = userType == 10 || userType == 8;
+            var isUnregistered = userType == 99; 
             if (data['register']['userType'] == 99) 
                 section = "UNREGISTERED"
             else if (data['register']['userType'] == 90)
@@ -246,28 +258,25 @@ function createBox(data){
     var box = '<div class="col-lg-3 col-xs-6">' +
             '<div class="small-box bg-aqua">' + 
             '<div class="inner">' +
-            '<h3>..user_name..</h3>' + 
-            '<p>..user_id..</p>'+ 
+            '<h3 class="intern-name">..user_name..</h3>' + 
+            '<p class="intern-id">..user_id..</p>'+ 
             '</div>' + 
             '<div class="icon">' + 
-            '<i>..arrive_time..</i>' + 
+            '<i class="fa fa-info-circle"></i>' + 
             '</div>' + 
-            '<a href="#" class="small-box-footer">Confirm <i class="fa fa-arrow-circle-right"></i></a>' + 
+            '<a href="#" class="small-box-footer">Confirm <i class="ion ion-checkmark-round"></i></a>' + 
             '</div>' + 
             '</div>';
     
     var re = new RegExp(/\.\.\w*\.\./)
     var filler = re.exec(box);
-    for (var i=0;i < 3;i++){
+    while(filler != null){
         switch(filler[0]){
             case '..user_name..':
                 box = box.replace(filler[0], data.name);
                 break;
             case '..user_id..': 
                 box = box.replace(filler[0], data.u_id);
-                break;
-            case '..arrive_time..':
-                box = box.replace(filler[0], data.time);
                 break;
         }
         filler = re.exec(box);
@@ -279,7 +288,7 @@ function createBox(data){
 function confirm_time(event, confirm_info){
     var box = $(event.target).parents('.small-box');
     
-    var confirm_data = {'u_id': box.find('.inner p').text(), 
+    var confirm_data = {'u_id': box.find('.inner p').text().trim(), 
                         'method': 'confirm'}
 
     $.ajax({
@@ -321,6 +330,7 @@ var TO_PRESENT = 'PRESENT'
 var TO_ARRIVE = 'CHECKIN'
 var TO_LUNCH = 'LUNCH'
 var TO_LEAVE = 'CHECKOUT'
+var TO_ABSENT = 'ABSENT'
 
 function moveBox(){
     var totalBox = $(this.box).parent('.col-lg-3.col-xs-6');
@@ -356,6 +366,52 @@ function populateTimeTable(data){
     $('.content > .content:not(.content.hidden),' +  
       '.content > .content-header:not(.content-header.hidden)').remove();
     $('.content-wrapper > .content:first-of-type').append(data);
+}
+
+function getTimeSpan(dataGrid, id){
+    // Searches for the ID before and 
+    // after the cell clicked and then
+    var times = $('.content .content:nth-of-type(12) table td:nth-of-type('+String(dataGrid[1]+2)+')')
+    var result = []; 
+    var idMask = RegExp(/\d{5}p/g);
+    console.log(times);
+    for(var time=0; time < times.length; time++){
+        var pushed = false;
+        if (time == dataGrid[0]){
+            result.push(time)
+            continue
+        }
+        var interns = $($(times[time]).find('.intern-work-slot')).text();
+        console.log(interns);
+        var intern = idMask.exec(interns);
+        while(intern != null){
+            if (intern == id){
+                result.push(time); 
+                console.log(result);
+                pushed = true;
+            } 
+            intern = idMask.exec(interns);
+        }
+        if (!pushed){
+            if (isConsecutive(result)){
+                return result.map(function(value){
+                    return $(times[value]);
+                })
+            }
+            result = [];
+        }
+    }
+    return false;
+}
+
+function isConsecutive(list){
+    for (var item=0; item < list.length - 1; item++){
+        console.log(list[item] + ', ' + list[item+1]);
+        if (list[item] + 1 != list[item+1]){
+            return false;
+        }
+    }
+    return true; 
 }
 
 // Error Types
@@ -407,6 +463,24 @@ function validate_inputs(event){
     }
 }
 
+function transform_form(event){
+    form = $(event.target).parents('#time_table').find('form')
+    form.find('#method-input').val('unassign');
+    validate_inputs(event);
+}
+
+function revertEditMode(modal){
+    modal = $(modal);
+    if (editMode){
+        $(modal.find('.modal-title')).text('Intern Timetable Add');
+        header = $('.modal-header', modal);
+        header.css(old_values);
+    }
+    
+    $(modal.find('.modal-footer .btn-danger')).addClass('hidden');
+    
+}
+
 function modalError(){
     btn = this.modal.find('.modal-footer .btn-success')
     btn.attr('data-toggle', 'popover');
@@ -443,3 +517,4 @@ function resetModal(event){
     $(modal.find('.has-error')).removeClass('.has-error');
     modal.find('.modal-footer .btn-success').popover('hide');
 }
+

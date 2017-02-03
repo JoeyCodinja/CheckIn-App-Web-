@@ -18,6 +18,7 @@ from utils.fcm import FCM_HTTP, FCM_XMPP
 from pprint import pprint
 
 web_app = Flask(__name__)
+web_app.config.update(DEBUG=True)
 database = Database()
 # xmpp = FCM_XMPP()
 # xmpp.connect()
@@ -238,17 +239,17 @@ def staff_dashboard():
     if 'error' in staff_uid_name:
         return login()
     
-    user_listing['sta`ff'] = Staff.from_db(database)
+    user_listing['staff'] = Staff.from_db(database)
     user_listing['intern'] = Intern.from_db(database)
     unregistered_listing =  Unregistered.from_db(database)
     logs = Log.from_db(database, staff_uid_name[0])
-    absent = Log.get_absent_interns(database, 
-                                    [user.getPassId() for user in user_listing['intern']],
-                                    staff_uid_name[0])
     pc_locations = PCLocations.from_db(database)
     timetable = Timetable.from_db(database)
+    absent = Log.get_absent_interns(database, 
+                                    [user.getPassId() for user in user_listing['intern']],
+                                    timetable.timetable,
+                                    staff_uid_name[0])
     
-    import pdb; pdb.set_trace()
     
     return render_template("staff.html", 
                            date_today      = datetime.now(),
@@ -410,7 +411,6 @@ def cancel_unregistered():
 @web_app.route('/dashboard/timetable', methods=["POST"])
 @login_required
 def timetable_update():
-    # Whenever we are updating this table
     args = request.form
     time = {'start': args['start_time'], 'end': args['end_time']}
     if args['method'] == u'assign':
@@ -420,10 +420,9 @@ def timetable_update():
         return template(ttable=timetable.timetable)
     elif args['method'] == u'unassign':
         timetable = Timetable.from_db(database)
-        time = {'start': args['blockStart'], 'end': args['blockEnd']}
-        timetable.unassign(args['day'], time, args['u_id'])
+        timetable.unassign(args['day'], time, args['u_id']).to_db(database)
         template = web_app.jinja_env.get_template('timetable.html').module.intern_timetable
-        return template(ttable=timetable)
+        return template(ttable=timetable.timetable)
         
     return jsonify({'error': 'Unknown method'})
     
@@ -733,7 +732,6 @@ def email_confirmation(time, mits_intern):
 
 if __name__ == "__main__":
     from jinja2.environment import Environment
-    web_app.config.debug = True
     web_app.jinja_env.add_extension('jinja2.ext.do')
-    web_app.run(os.getenv('IP', '0.0.0.0'), os.getenv('PORT', 8080))
+    web_app.run(os.getenv('IP', '0.0.0.0'), int(os.getenv('PORT', 8080)))
     
