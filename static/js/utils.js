@@ -31,7 +31,7 @@ function post(uri, params){
             
         form.insertAdjacentElement('beforeend', input);
     }
-    
+    $('body').append(form);
     form.submit();
 } 
 

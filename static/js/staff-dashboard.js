@@ -363,9 +363,11 @@ function addBox(box, where){
 
 // Timetable functions
 function populateTimeTable(data){
-    $('.content > .content:not(.content.hidden),' +  
-      '.content > .content-header:not(.content-header.hidden)').remove();
-    $('.content-wrapper > .content:first-of-type').append(data);
+    // var table = 
+    var days = Object.key(data); 
+    for (day=0; day < days.length; day++){
+        data.days[day] 
+    }
 }
 
 function getTimeSpan(dataGrid, id){

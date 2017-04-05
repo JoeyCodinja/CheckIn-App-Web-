@@ -116,13 +116,17 @@ class Log:
         for log in logs:
             intern_in_list = log.logger in intern_list
             todays_log = today == log._Log__log_time.date()
-            timetabled_today = [log.logger in timetable[today.strftime('%A')][times] for times in timetable[today.strftime('%A')]]
-            timetabled_today = reduce(lambda x, y: x | y, timetabled_today)
-            if intern_in_list:
-                if todays_log or not timetabled_today:
-                    intern_list.remove(log.logger)
-            else: 
-                continue
+            try: 
+                timetabled_today = [log.logger in timetable[today.strftime('%A')][times] for times in timetable[today.strftime('%A')]]
+                timetabled_today = reduce(lambda x, y: x | y, timetabled_today)
+                if intern_in_list:
+                    if todays_log or not timetabled_today:
+                        intern_list.remove(log.logger)
+                else: 
+                    continue
+            except KeyError:
+                # The day isn't a timetable-able day (Saturday, Sunday)
+                return []
         return intern_list
                 
     @staticmethod

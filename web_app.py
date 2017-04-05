@@ -303,8 +303,6 @@ def staff_update():
 def assign_system():
     # UUIDs for a particular location are added based on user request
     
-    import pdb; pdb.set_trace()
-    
     location = request.form['location']
     uuid = request.form['uuid']
     
@@ -416,13 +414,11 @@ def timetable_update():
     if args['method'] == u'assign':
         timetable = Timetable.from_db(database)
         timetable.assign(args['day'], time, args['u_id']).to_db(database)
-        template = web_app.jinja_env.get_template('timetable.html').module.intern_timetable
-        return template(ttable=timetable.timetable)
+        return jsonify(timetable.timetable)
     elif args['method'] == u'unassign':
         timetable = Timetable.from_db(database)
         timetable.unassign(args['day'], time, args['u_id']).to_db(database)
-        template = web_app.jinja_env.get_template('timetable.html').module.intern_timetable
-        return template(ttable=timetable.timetable)
+        return jsonify(timetable.timetable)
         
     return jsonify({'error': 'Unknown method'})
     

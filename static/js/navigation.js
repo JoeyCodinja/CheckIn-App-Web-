@@ -169,6 +169,10 @@ $('i[data-target*=time_table]').click(function(){
     $('#time_table input[name=day]').each(function(){
         if ($(this).val() == dayAndTime.day){
             $(this).attr('checked', true)
+        } else {
+            if ($(this).attr('checked') == true){
+                $(this.attr('checked', false));
+            }
         }
     });
         
@@ -176,7 +180,11 @@ $('i[data-target*=time_table]').click(function(){
             if ($(this).val() == dayAndTime.time){
                 $(this).attr('selected', true)
                     .parent()
-                    .attr('readonly', true);
+                    .attr('readonly', false);
+            } else{
+                if ($(this).attr('selected') == true){
+                    $(this).attr('selected', false)
+                }
             }
         });
     
