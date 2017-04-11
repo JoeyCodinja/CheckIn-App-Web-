@@ -1,4 +1,5 @@
 from Personnel import Personnel
+from Log import Log
 from punchin_utils import Utils
 
 class Intern(Personnel):
@@ -8,6 +9,10 @@ class Intern(Personnel):
         super(Intern, self).__init__(name, p_id, last_state)
         self.__email = email
         self.database = database or None
+        try:
+            self.logs = Log.from_db(self.database, p_id, p_id)
+        except ValueError: 
+            self.logs = None
         
     def getEmail(self):
         return Utils.parse_email_id(self.__email)
@@ -24,6 +29,8 @@ class Intern(Personnel):
         
         return query['userType'] == Intern.INTERN
         
+    def get_logs(self):
+        return self.logs
     
     @staticmethod
     def from_db(database, key=None):

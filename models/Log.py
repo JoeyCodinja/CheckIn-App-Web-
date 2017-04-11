@@ -130,7 +130,7 @@ class Log:
         return intern_list
                 
     @staticmethod
-    def from_db(database, u_id, key=None):
+    def from_db(database, u_id, key=None , date_start=None, date_end=None):
         def key_is_id(key):
             if re.match(r'\d{5}p', key):
                 return True
@@ -182,7 +182,7 @@ class Log:
                     pass
             
             return Log(**instance_args)
-            
+        
         if u_id not in Log.staff_members(database) and u_id != key:
             # Should either be a staff member, 
             # or the persons own logs
@@ -192,6 +192,21 @@ class Log:
         if key is not None:
             if key_is_id(key):
                 result = database.query('/log')
+                if date_start or date_end:
+                    log_list = []
+                    for item in result: 
+                        date_args = tuple(result[item]['date'].split('-'))
+                        log_date = datetime.date(*date_args)
+                        id_is_key = result[item]['from'] == key
+                        if date_end:
+                            if date_end >= log_date >= date_start and id_is_key:
+                                log_list.append(construct_instance(item, result[item]))
+                        else:
+                            if log_date >= date_start and id_is_key: 
+                               log_list.append(construct_instance(item, result[item]))
+                    import pdb;pdb.set_trace()
+                    return log_list
+                    
                 for item in result:
                     todays_log = result[item]['date'] == \
                         datetime.now().date().isoformat()

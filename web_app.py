@@ -64,6 +64,12 @@ def signin_required(f):
                 return f(data, *args, **kwargs)
             else:
                 return generate_error_template(ERROR_NO_TOKEN, *args, **kwargs)
+        if request.method == "GET": 
+            # Possibly an API call
+            if 'f_token' in request.args:
+                database.set_token(request.args['f_token'])
+                return f(*args, **kwargs)
+                
     return is_signed_in
 
 def login_required(f):
@@ -542,6 +548,64 @@ def message_web():
 @web_app.route('/dashboard/messaging/ios')
 def message_ios():
     pass
+
+@web_app.route('/api/<string:intern_id>/log')
+@signin_required
+def get_intern_logs(intern_id):
+    import re
+    import datetime
+
+    # Clean input
+    def is_valid_date(date): 
+        # Checks to see if date string contains the following format YYYY-MM-DD
+        date_pattern = re.compile(r'^(?=\d)(?:(?!(?:1582(?:\.|-|\/)10(?:\.|-|\/)(?:0?[5-9]|1[0-4]))|(?:1752(?:\.|-|\/)0?9(?:\.|-|\/)(?:0?[3-9]|1[0-3])))(?=(?:(?!000[04]|(?:(?:1[^0-6]|[2468][^048]|[3579][^26])00))(?:(?:\d\d)(?:[02468][048]|[13579][26]))\D0?2\D29)|(?:\d{4}\D(?!(?:0?[2469]|11)\D31)(?!0?2(?:\.|-|\/)(?:29|30))))(\d{4})([-\/.])(0?\d|1[012])\2((?!00)[012]?\d|3[01])(?:$|(?=\x20\d)\x20))?((?:(?:0?[1-9]|1[012])(?::[0-5]\d){0,2}(?:\x20[aApP][mM]))|(?:[01]\d|2[0-3])(?::[0-5]\d){1,2})?$')
+        date_match = date_pattern.match(date)
+        if date_match: 
+            date_args = map(lambda x: int(x), list([date_match.groups()[:4][0]]) + list(date_match.groups()[:4][2:]))
+            return datetime.date(*tuple(date_args))
+        else:
+            return False
+    
+    def is_valid_id(id):
+        import re
+        if re.match(r'\d{5}p', id):
+            return True
+        return False
+    
+    start_date_present = request.args['date_start'] if 'date_start' in request.args else None 
+    end_date_present = request.args['date_end'] if 'date_end' in request.args else None
+    
+        
+    if is_valid_id(intern_id):
+        if start_date_present: 
+            if end_date_present: 
+                # End date present; API returns log data between the dates provided
+                valid_dates = [start_date_present, end_date_present]
+                valid_dates = [is_valid_date(date) for date in valid_dates]
+                reduce_func = lambda x,y: True if x else False and True if y else False
+                if reduce(reduce_func, valid_dates):
+                    # Both dates are valid
+                    try: 
+                        result = Log.from_db(database, intern_id, valid_dates[0], valid_dates[1])
+                        import pdb; pdb.set_trace()
+                        if isinstance(result, ValueError):
+                            raise result
+                        else: 
+                            return result
+                    except ValueError as e: 
+                        import pdb;pdb.set_trace()
+                        return str(e)
+                else: 
+                    return 'Error'
+            # Start date alone is present; API returns all log data from this point forwards
+            valid_date = is_valid_date(start_date_present) 
+            if valid_date: 
+                # Date is valid
+                return Log.from_db(database, intern_id, valid_date)
+                
+    return 'Error'
+
+
 
 def validate_user(email):
     # Users are validated on their first 
