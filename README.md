@@ -8,13 +8,13 @@ This application is built using Flask, the Python programming language and also 
 
 Current Features
 
-Interns able to log their arrival, departure and lunch times
+ - ###### Interns able to log their arrival, departure and lunch times
 
-Staff are able to view these arrival, departure and lunch times 
+ - ###### Staff are able to view these arrival, departure and lunch times 
 
-Staff are able to register interns
+ - ###### Staff are able to register interns
 
-Staff are able to register other staff members
+ - ###### Staff are able to register other staff members
 
 
 
