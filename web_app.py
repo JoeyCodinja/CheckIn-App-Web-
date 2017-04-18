@@ -575,7 +575,6 @@ def get_intern_logs(intern_id):
     start_date_present = request.args['date_start'] if 'date_start' in request.args else None 
     end_date_present = request.args['date_end'] if 'date_end' in request.args else None
     
-        
     if is_valid_id(intern_id):
         if start_date_present: 
             if end_date_present: 
@@ -586,14 +585,13 @@ def get_intern_logs(intern_id):
                 if reduce(reduce_func, valid_dates):
                     # Both dates are valid
                     try: 
-                        result = Log.from_db(database, intern_id, valid_dates[0], valid_dates[1])
-                        import pdb; pdb.set_trace()
+                        result = Log.from_db(database, '79560p', intern_id, valid_dates[0], valid_dates[1])
+                        import pdb;pdb.set_trace()
                         if isinstance(result, ValueError):
                             raise result
                         else: 
                             return result
                     except ValueError as e: 
-                        import pdb;pdb.set_trace()
                         return str(e)
                 else: 
                     return 'Error'

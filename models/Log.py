@@ -195,16 +195,16 @@ class Log:
                 if date_start or date_end:
                     log_list = []
                     for item in result: 
-                        date_args = tuple(result[item]['date'].split('-'))
-                        log_date = datetime.date(*date_args)
+                        date_args = tuple([int(arg) for arg in result[item]['date'].split('-')])
+                        log_date = datetime(*date_args).date()
                         id_is_key = result[item]['from'] == key
+                        import pdb; pdb.set_trace()
                         if date_end:
                             if date_end >= log_date >= date_start and id_is_key:
                                 log_list.append(construct_instance(item, result[item]))
                         else:
                             if log_date >= date_start and id_is_key: 
                                log_list.append(construct_instance(item, result[item]))
-                    import pdb;pdb.set_trace()
                     return log_list
                     
                 for item in result:
