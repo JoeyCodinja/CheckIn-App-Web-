@@ -554,6 +554,7 @@ def message_ios():
 def get_intern_logs(intern_id):
     import re
     import datetime
+    import pdb
 
     # Clean input
     def is_valid_date(date): 
@@ -586,11 +587,12 @@ def get_intern_logs(intern_id):
                     # Both dates are valid
                     try: 
                         result = Log.from_db(database, '79560p', intern_id, valid_dates[0], valid_dates[1])
-                        import pdb;pdb.set_trace()
                         if isinstance(result, ValueError):
                             raise result
-                        else: 
-                            return result
+                        else:
+                            result = [item.to_dict() for item in result]
+                            pdb.set_trace()
+                            return jsonify(result)
                     except ValueError as e: 
                         return str(e)
                 else: 
@@ -599,7 +601,10 @@ def get_intern_logs(intern_id):
             valid_date = is_valid_date(start_date_present) 
             if valid_date: 
                 # Date is valid
-                return Log.from_db(database, intern_id, valid_date)
+                result = Log.from_db(database, intern_id, valid_date)
+                result = [item.to_dict() for item in result]
+                pdb.set_trace()
+                return jsonify(result)
                 
     return 'Error'
 

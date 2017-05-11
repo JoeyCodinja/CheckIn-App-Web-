@@ -464,10 +464,7 @@ desired effect
   // Wait a few seconds to get everything to load first
   setTimeout(reinitializeAuth, 3000);
 </script>
-<!-- Optionally, you can add Slimscroll and FastClick plugins.
-     Both of these plugins are recommended to enhance the
-     user experience. Slimscroll is required when using the
-     fixed layout. -->
+
 {% import 'manage_users.html' as user_manage %}
 {% import 'pc_locate.html' as locate_pc %} 
 {{ timetable.assign_time_intern(ttable['Monday'].keys(), user_listing['intern']) }} 

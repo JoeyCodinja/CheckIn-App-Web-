@@ -1,7 +1,7 @@
 import random 
 from datetime import datetime, timedelta
 from PCLocations import PCLocations
-
+import json
 import re
 
 class Log:
@@ -53,7 +53,37 @@ class Log:
             self.__confirm_data = {'who':None, 
                                    'state':False, 
                                    'time':None}
-                                   
+                        
+                        
+    def __repr__(self):
+        lunch_time = self.__lunch_time
+        lunch_time['start'] = lunch_time['start'].time().isoformat() if isinstance(lunch_time['start'], datetime) else lunch_time['start']
+        return json.dumps({
+                'from': self.__logger, 
+                'type': self.__ltype,
+                'date': self.__log_time.date().isoformat(),
+                'where': self.__location,
+                'leave_time': self.__leave, 
+                'arrive-time': self.__log_time.time().isoformat()[:8],
+                'lunch-time': self.__lunch_time,
+                'confirmed': self.__confirm_data
+               })
+    
+    def to_dict(self):
+        lunch_time = self.__lunch_time 
+        lunch_time['start'] = lunch_time['start'].time().isoformat() if isinstance(lunch_time['start'], datetime) else lunch_time['start']
+        return {
+                'id': self.__lid,
+                'from': self.__logger,
+                'type': self.__ltype,
+                'date': self.__log_time.date().isoformat(),
+                'where': self.__location,
+                'leave-time': self.__leave, 
+                'arrive-time': self.__log_time.time().isoformat()[:8],
+                'lunch-time': self.__lunch_time, 
+                'confirmed': self.__confirm_data
+               }
+                     
     def __validate_confirm_data(self, data):
         has_time = 'time' in data
         has_confirmer = 'who' in data
@@ -198,7 +228,6 @@ class Log:
                         date_args = tuple([int(arg) for arg in result[item]['date'].split('-')])
                         log_date = datetime(*date_args).date()
                         id_is_key = result[item]['from'] == key
-                        import pdb; pdb.set_trace()
                         if date_end:
                             if date_end >= log_date >= date_start and id_is_key:
                                 log_list.append(construct_instance(item, result[item]))
@@ -258,6 +287,9 @@ class Log:
         
         users = database.query('/user')
         staff_members = []
+        if 'error' in users: 
+            # We don't have access to the database 
+            return Exception
         for user in users:
             is_staff = users[user]['userType'] == STAFF
             is_staffadmin = users[user]['userType'] == STAFF & ADMIN
