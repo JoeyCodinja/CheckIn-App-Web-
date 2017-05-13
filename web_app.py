@@ -554,7 +554,6 @@ def message_ios():
 def get_intern_logs(intern_id):
     import re
     import datetime
-    import pdb
 
     # Clean input
     def is_valid_date(date): 
@@ -591,7 +590,6 @@ def get_intern_logs(intern_id):
                             raise result
                         else:
                             result = [item.to_dict() for item in result]
-                            pdb.set_trace()
                             return jsonify(result)
                     except ValueError as e: 
                         return str(e)
@@ -603,7 +601,6 @@ def get_intern_logs(intern_id):
                 # Date is valid
                 result = Log.from_db(database, intern_id, valid_date)
                 result = [item.to_dict() for item in result]
-                pdb.set_trace()
                 return jsonify(result)
                 
     return 'Error'
