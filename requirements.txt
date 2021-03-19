@@ -1,7 +1,7 @@
 BzrTools==2.6.0
 Flask==0.11.1
 Flask-Mail==0.9.1
-Jinja2==2.8
+Jinja2==2.11.3
 MarkupSafe==0.23
 Pillow==2.3.0
 Pyrebase==3.0.24
