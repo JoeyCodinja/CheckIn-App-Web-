@@ -64,7 +64,7 @@ python-jwt==2.0.1
 pytz==2012c
 requests==2.11.1
 requests-toolbelt==0.7.0
-rsa==3.4.2
+rsa==4.7
 scipy==0.13.3
 simplegeneric==0.8.1
 simplejson==3.3.1
